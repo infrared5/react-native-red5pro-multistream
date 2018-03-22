@@ -6,7 +6,9 @@ const { UIManager } = NativeModules
 const { R5MultiVideoView } = UIManager
 const { Commands } = R5MultiVideoView
 
-export const subscribe = (handle, streamName, host, context,
+export const subscribe = (handle, streamName,
+  host,
+  context,
   withVideo,
   audioMode = R5AudioMode.STANDARD) => {
   UIManager.dispatchViewManagerCommand(handle, Commands.subscribe, [
@@ -24,16 +26,20 @@ export const preview = (handle, streamName) => {
   UIManager.dispatchViewManagerCommand(handle, Commands.preview, [streamName])
 }
 
-export const publish = (handle, streamName, host, context,
-  withVideo, width, height,
+export const publish = (handle, streamName,
+  host,
+  context,
+  withVideo,
+  cameraWidth = 640,
+  cameraHeight = 360,
   streamType = R5PublishType.LIVE) => {
   UIManager.dispatchViewManagerCommand(handle, Commands.publish, [
     streamName,
     host,
     context,
     withVideo,
-    width,
-    height,
+    cameraWidth,
+    cameraHeight,
     streamType
   ])
 }

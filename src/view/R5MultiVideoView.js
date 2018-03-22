@@ -27,46 +27,46 @@ class R5MultiVideoView extends React.Component {
     return false
   }
 
-  _onMetaData = (streamName, event) => {
+  _onMetaData = (event) => {
     if (!this.props.onMetaData) {
       return
     }
-    this.props.onMetaData(streamName, event)
+    this.props.onMetaData(event)
   }
 
-  _onConfigured = (streamName, event) => {
+  _onConfigured = (event) => {
     if (!this.props.onConfigured) {
       return
     }
-    this.props.onConfigured(streamName, event)
+    this.props.onConfigured(event)
   }
 
-  _onPublisherStreamStatus = (streamName, event) => {
+  _onPublisherStreamStatus = (event) => {
     if (!this.props.onPublisherStreamStatus) {
       return
     }
-    this.props.onPublisherStreamStatus(streamName, event)
+    this.props.onPublisherStreamStatus(event)
   }
 
-  _onSubscriberStreamStatus = (streamName, event) => {
+  _onSubscriberStreamStatus = (event) => {
     if (!this.props.onSubscriberStreamStatus) {
       return
     }
-    this.props.onSubscriberStreamStatus(streamName, event)
+    this.props.onSubscriberStreamStatus(event)
   }
 
-  _onUnsubscribeNotification = (streamName, event) => {
+  _onUnsubscribeNotification = (event) => {
     if (!this.props.onUnsubscribeNotification) {
       return
     }
-    this.props.onUnsubscribeNotification(streamName, event)
+    this.props.onUnsubscribeNotification(event)
   }
 
-  _onUnpublishNotification = (streamName, event) => {
+  _onUnpublishNotification = (event) => {
     if (!this.props.onUnpublishNotification) {
       return
     }
-    this.props.onUnpublishNotification(streamName, event)
+    this.props.onUnpublishNotification(event)
   }
 
   _refHandle = (video) => {
@@ -100,6 +100,9 @@ R5MultiVideoView.propTypes = {
     logLevel: PropTypes.oneOf([R5LogLevel.ERROR, R5LogLevel.WARN, R5LogLevel.INFO, R5LogLevel.DEBUG]),
     licenseKey: PropTypes.string.isRequired,
     bundleID: PropTypes.string.isRequired,
+    bitrate: PropTypes.number,                      // publisher only, kb/s
+    framerate: PropTypes.number,                    // publisher only, fps
+    useAdaptiveBitrateController: PropTypes.bool,   // publisher only
     bufferTime: PropTypes.number,
     streamBufferTime: PropTypes.number,
     key: PropTypes.string.isRequired,
@@ -114,6 +117,9 @@ R5MultiVideoView.propTypes = {
 R5MultiVideoView.defaultProps = {
   showDebugView: false,
   logLevel: R5LogLevel.ERROR,
+  bitrate: 750,
+  framerate: 15,
+  useAdaptiveBitrateController: false,
   bufferTime: 0.5,
   streamBufferTime: 2
 }
