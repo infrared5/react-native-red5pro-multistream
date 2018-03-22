@@ -16,6 +16,7 @@ import com.red5pro.streaming.R5Stream;
 import com.red5pro.streaming.config.R5Configuration;
 import com.red5pro.streaming.event.R5ConnectionEvent;
 import com.red5pro.streaming.event.R5ConnectionListener;
+import com.red5pro.streaming.media.R5AudioController;
 import com.red5pro.streaming.view.R5VideoView;
 
 /**
@@ -87,6 +88,7 @@ public class SubscriberStream implements Stream, R5ConnectionListener {
     @Override
     public void start() {
 
+        mStream.audioController = new R5AudioController();
         mStream.play(mStreamName);
 
     }

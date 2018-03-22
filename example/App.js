@@ -131,6 +131,65 @@ export default class App extends React.Component {
     }
     */
   }
+
+  onPublisherStreamStatus (event) {
+    console.log(`onPublisherStreamStatus :: ${JSON.stringify(event.nativeEvent.status, null, 2)}`)
+    const status = event.nativeEvent.status
+    let message = isValidStatusMessage(status.message) ? status.message : status.name
+      /*
+    if (!this.state.inErrorState) {
+      this.setState({
+        toastProps: {...this.state.toastProps, value: message},
+        isInErrorState: (status.code === 2)
+      })
+    }
+    */
+  }
+
+  onSubscriberStreamStatus (event) {
+    console.log(`onSubscriberStreamStatus :: ${JSON.stringify(event.nativeEvent.status, null, 2)}`)
+    const status = event.nativeEvent.status
+    let message = isValidStatusMessage(status.message) ? status.message : status.name
+      /*
+    if (!this.state.inErrorState) {
+      this.setState({
+        toastProps: {...this.state.toastProps, value: message},
+        isInErrorState: (status.code === 2)
+      })
+    }
+    */
+  }
+
+  onUnsubscribeNotification (event) {
+    console.log(`onUnsubscribeNotification:: ${JSON.stringify(event.nativeEvent.status, null, 2)}`)
+      /*
+    this.setState({
+      hasStarted: false,
+      isInErrorState: false,
+      toastProps: {...this.state.toastProps, value: 'waiting...'}
+    })
+    */
+  }
+
+  onUnpublishNotification (event) {
+    console.log(`onUnpublishNotification:: ${JSON.stringify(event.nativeEvent.status, null, 2)}`)
+      /*
+    this.setState({
+      hasStarted: false,
+      isInErrorState: false,
+      toastProps: {...this.state.toastProps, value: 'waiting...'}
+    })
+    */
+  }
+
+  onPublish () {
+  }
+
+  onSubscribe () {
+  }
+
+  onStop () {
+  }
   
 }
 

@@ -75,12 +75,12 @@ class R5MultiStreamView extends React.Component {
 
   _onLayout = (event) => {
     // const layout = event.nativeEvent.layout
-    // console.log(`R5Video:onLayout: ${event.nativeEvent.layout.x}, ${event.nativeEvent.layout.y}, ${event.nativeEvent.layout.width}x${event.nativeEvent.layout.height}`);
+    // console.log(`R5MultiStream:onLayout: ${event.nativeEvent.layout.x}, ${event.nativeEvent.layout.y}, ${event.nativeEvent.layout.width}x${event.nativeEvent.layout.height}`);
   }
 
   render() {
     let elementRef = this.props.videoRef ? this.props.videoRef : this._refHandle
-    return <R5Video
+    return <R5MultiStream
             ref={elementRef}
             {...this.props}
             onLayout={this._onLayout}

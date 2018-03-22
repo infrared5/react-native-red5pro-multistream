@@ -21,4 +21,3 @@ module.exports = {
   swapCamera, updateScaleMode, updateScaleSize,
   R5AudioMode, R5LogLevel, R5PublishType, R5ScaleMode
 }
-
