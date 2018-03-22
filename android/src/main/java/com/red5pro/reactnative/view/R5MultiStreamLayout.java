@@ -183,7 +183,9 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
 
         PublisherStream publisher = new PublisherStream(mContext, this, withVideo ? createVideoView() : null);
         publisher.init(createConfiguration(streamName, host, context),
-                cameraWidth, cameraHeight, mBitrate, mFramerate
+                cameraWidth, cameraHeight,
+                mBitrate, mFramerate,
+                streamType,
                 mUseAdaptiveBitrateController);
         publisher.start();
         if (publisher.getView() != null) {

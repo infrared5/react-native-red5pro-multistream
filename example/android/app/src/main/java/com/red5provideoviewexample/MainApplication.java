@@ -8,7 +8,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 
-import com.red5pro.reactnative.R5MultiPackage;
+import com.red5pro.reactnative.R5MultiStreamPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,7 +25,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-          new R5MultiPackage()
+          new R5MultiStreamPackage()
       );
     }
 
