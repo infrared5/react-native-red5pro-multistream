@@ -105,7 +105,6 @@ R5MultiStreamView.propTypes = {
     useAdaptiveBitrateController: PropTypes.bool,   // publisher only
     bufferTime: PropTypes.number,
     streamBufferTime: PropTypes.number,
-    key: PropTypes.string.isRequired,
     onConfigured: PropTypes.func,
     onMetaDataEvent: PropTypes.func,
     onPublisherStreamStatus: PropTypes.func,

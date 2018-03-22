@@ -38,6 +38,7 @@ export default class App extends React.Component {
     this.onSubscribe = this.onSubscribe.bind(this)
     this.onStop = this.onStop.bind(this)
 
+    const theKey = `red5pro-${Math.floor(Math.random() * 0x10000).toString(16)}`
     this.state = {
       hasPermissions: false,
       isPublisher: false,
@@ -49,13 +50,11 @@ export default class App extends React.Component {
         style: styles.inputField
       },
       videoProps: {
-        ref: 'video',
-        key: 'video',
+        key: theKey,
+        licenseKey: licenseKey,
+        bundleID: bundleID,
         configuration: {
-          host: host,
-          licenseKey: licenseKey,
-          bundleID: bundleID,
-          key: Math.floor(Math.random() * 0x10000).toString(16)
+          host: host
         },
         logLevel: R5LogLevel.DEBUG,
         onMetaData: this.onMetaData,
