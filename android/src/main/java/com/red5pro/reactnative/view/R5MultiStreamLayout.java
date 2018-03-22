@@ -188,9 +188,7 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
                 streamType,
                 mUseAdaptiveBitrateController);
         publisher.start();
-        if (publisher.getView() != null) {
-            publisher.updateScaleSize(mClientWidth, mClientHeight, mClientScreenWidth, mClientScreenHeight);
-        }
+        
         streamMap.put(streamName, publisher);
         onConfigured(streamName, streamName + this.getId());
 

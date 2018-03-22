@@ -17,9 +17,19 @@ import {
   unpublish
 } from 'react-native-red5pro-multistream'
 
-const host = 'nafarat.red5.org'
+const host = '52.77.244.201'
 const licenseKey = 'IBBB-LOPP-I32M-UIOS'
 const bundleID = 'com.red5pro.multistream'
+
+const PubType = {
+  NONE: 0,
+  AUDIO: 1,
+  VIDEO: 2
+}
+
+const isValidStatusMessage = (value) => {
+  return value && typeof value !== 'undefined' && value !== 'undefined' && value !== 'null'
+}
 
 export default class App extends React.Component {
   constructor (props) {
@@ -35,13 +45,14 @@ export default class App extends React.Component {
 
     // Actions.
     this.onPublish = this.onPublish.bind(this)
+    this.onPublishAudio = this.onPublishAudio.bind(this)
     this.onSubscribe = this.onSubscribe.bind(this)
     this.onStop = this.onStop.bind(this)
 
-    const theKey = `red5pro-${Math.floor(Math.random() * 0x10000).toString(16)}`
     this.state = {
       hasPermissions: false,
-      isPublisher: false,
+      publisherSelection: PubType.NONE,
+      streamName: undefined,
       streamNameFieldProps: {
         placeholder: 'Stream Name',
         autoCorrect: false,
@@ -50,7 +61,7 @@ export default class App extends React.Component {
         style: styles.inputField
       },
       videoProps: {
-        key: theKey,
+        style: styles.videoView,
         licenseKey: licenseKey,
         bundleID: bundleID,
         configuration: {
@@ -83,13 +94,42 @@ export default class App extends React.Component {
       })
   }
 
+  componentDidUpdate (prevProps, prevState) {
+    if (prevState.publisherSelecion !== this.state.publisherSelection &&
+        this.state.publisherSelection !== PubType.NONE) {
+      const withVideo = this.state.publisherSelection === PubType.VIDEO
+      publish(findNodeHandle(this.red5provideo_publisher),
+        this.state.streamName,
+        host,
+        'live',
+        withVideo)
+    }
+  }
+
   render() {
+    if (this.state.hasPermissions && this.state.publisherSelection !== PubType.NONE) {
+      const assignVideoRef = (video) => { this.red5provideo_publisher = video }
+      return (
+        <View style={styles.container}>
+          <R5MultiStreamView
+            ref={assignVideoRef}
+            {...this.state.videoProps} 
+          />
+          <Button title="Stop" onPress={this.onStop} />
+        </View>
+      )
+    } else if (this.state.hasPermissions) {
+      return (
+        <View style={[styles.container, { alignItems: 'center', justifyContent: 'space-between' }]}>
+          <Button style={{ marginBottom: 20 }} onPress={this.onPublishAudio} title="Publish Audio" />
+          <Button onPress={this.onPublish} title="Publish Video+Audio" />
+        </View>
+      )
+    }
+
     return (
       <View style={styles.container}>
-        <Text>Open up App.js to start working on your app!</Text>
-        <Text>Changes you make will automatically reload.</Text>
-        <Text>Shake your phone to open the developer menu.</Text>
-        <R5MultiStreamView {...this.state.videoProps} />
+        <Text>Waiting for permissions...</Text>
       </View>
     )
   }
@@ -117,7 +157,7 @@ export default class App extends React.Component {
   }
 
   onConfigured (event) {
-    console.log(`onConfigured(${event.nativeEvent.streamName}) :: ${event.nativeEvent.key}`)
+    console.log(`onConfigured :: ${event.nativeEvent.key}`)
     /*
     this.refs.video.setState({
       configured: true
@@ -182,12 +222,30 @@ export default class App extends React.Component {
   }
 
   onPublish () {
+    const randomId = `red5pro-${Math.floor(Math.random() * 0x10000).toString(16)}`
+    this.setState({
+      streamName: 'videoStream' + randomId,
+      publisherSelection: PubType.VIDEO
+    })
+  }
+
+  onPublishAudio () {
+    const randomId = `red5pro-${Math.floor(Math.random() * 0x10000).toString(16)}`
+    this.setState({
+      streamName: 'audioStream' + randomId,
+      publisherSelection: PubType.AUDIO
+    })
   }
 
   onSubscribe () {
   }
 
   onStop () {
+    unpublish(findNodeHandle(this.red5provideo_publisher), this.state.streamName)
+    this.setState({
+      streamName: undefined,
+      publisherSelection: PubType.NONE
+    })
   }
   
 }
@@ -196,7 +254,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
     justifyContent: 'center'
+  },
+  videoView: {
+    flex: 1,
+    flexDirection: 'row',
+    // justifyContent: 'center',
+    backgroundColor: 'black'
   }
 })
