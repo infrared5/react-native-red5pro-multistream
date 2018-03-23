@@ -87,23 +87,34 @@ public class PublisherStream implements Stream, R5ConnectionListener {
 
     protected void setupCamera(int width, int height, int bitrate, int framerate) {
 
-        Camera device = mUseBackfacingCamera
-                ? openBackFacingCameraGingerbread()
-                : openFrontFacingCameraGingerbread();
+        try {
+            Camera device = mUseBackfacingCamera
+                    ? openBackFacingCameraGingerbread()
+                    : openFrontFacingCameraGingerbread();
 
-        updateDeviceOrientationOnLayoutChange();
-        int rotate = mUseBackfacingCamera ? 0 : 180;
-        device.setDisplayOrientation((mCameraOrientation + rotate) % 360);
+            updateDeviceOrientationOnLayoutChange();
+            int rotate = mUseBackfacingCamera ? 0 : 180;
+            device.setDisplayOrientation((mCameraOrientation + rotate) % 360);
 
-        R5Camera camera = new R5Camera(device, width, height);
-        camera.setBitrate(bitrate);
-        camera.setOrientation(mCameraOrientation);
-        camera.setFramerate(framerate);
+            R5Camera camera = new R5Camera(device, width, height);
+            camera.setBitrate(bitrate);
+            camera.setOrientation(mCameraOrientation);
+            camera.setFramerate(framerate);
 
-        mCamera = camera;
-        Camera.Parameters params = mCamera.getCamera().getParameters();
-        params.setRecordingHint(true);
-        mCamera.getCamera().setParameters(params);
+            mCamera = camera;
+            Camera.Parameters params = mCamera.getCamera().getParameters();
+            params.setRecordingHint(true);
+            mCamera.getCamera().setParameters(params);
+        }
+        catch(Exception e) {
+            WritableMap map = new WritableNativeMap();
+            WritableMap statusMap = new WritableNativeMap();
+            statusMap.putInt("code", R5ConnectionEvent.ERROR.value());
+            statusMap.putString("message", "Camera Issue. " + e.getMessage());
+            statusMap.putString("name", R5ConnectionEvent.ERROR.name());
+            map.putMap("status", statusMap);
+            mEventEmitter.dispatchEvent(mStreamName, R5MultiStreamLayout.Events.PUBLISHER_STATUS.toString(), map);
+        }
 
     }
 
