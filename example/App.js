@@ -17,9 +17,12 @@ import {
   unpublish
 } from 'react-native-red5pro-multistream'
 
-const host = '52.77.244.201'
+const host = '18.218.79.30'
 const licenseKey = 'IBBB-LOPP-I32M-UIOS'
 const bundleID = 'com.red5pro.multistream'
+
+const streamlistURL = 'https://nafarat.red5.org/streammanager/api/2.0/event/list'
+const subscribeURL = 'https://nafarat.red5.org/streammanager/api/2.0/event/live/{streamName}?action=subscribe'
 
 const PubType = {
   NONE: 0,
@@ -49,10 +52,14 @@ export default class App extends React.Component {
     this.onSubscribe = this.onSubscribe.bind(this)
     this.onStop = this.onStop.bind(this)
 
+    this._checkForSubscriptionStreams = this._checkForSubscriptionStreams.bind(this)
+    this._updateSubscriberList = this._updateSubscriberList.bind(this)
+
     this.state = {
       hasPermissions: false,
       publisherSelection: PubType.NONE,
       streamName: undefined,
+      subscriberList: [],
       streamNameFieldProps: {
         placeholder: 'Stream Name',
         autoCorrect: false,
@@ -94,21 +101,41 @@ export default class App extends React.Component {
       })
   }
 
+  componentWillUpdate (nextProps, nextState) {
+    const currentSubs = this.state.subscriberList
+    const currentLength = currentSubs.length;
+    const nextSubs = nextState.subscriberList
+    if (currentLength < nextSubs.length) {
+      const newSubs = nextSubs.slice(currentLength - 1)
+      newSubs.map((sub, index) => {
+        const withVideo = sub.name.match(/video/)
+        subscribe(findNodeHandle(this.red5pro_multistream),
+          sub.name,
+          sub.serverAddress,
+          sub.scope,
+          withVideo)
+      })
+    } else if (currentLength > nextSubs.length) {
+      // TODO: unsubscribe
+    }
+  }
+
   componentDidUpdate (prevProps, prevState) {
     if (prevState.publisherSelecion !== this.state.publisherSelection &&
         this.state.publisherSelection !== PubType.NONE) {
       const withVideo = this.state.publisherSelection === PubType.VIDEO
-      publish(findNodeHandle(this.red5provideo_publisher),
+      publish(findNodeHandle(this.red5pro_multistream),
         this.state.streamName,
         host,
         'live',
         withVideo)
+      this._checkForSubscriptionStreams(streamlistURL)
     }
   }
 
   render() {
     if (this.state.hasPermissions && this.state.publisherSelection !== PubType.NONE) {
-      const assignVideoRef = (video) => { this.red5provideo_publisher = video }
+      const assignVideoRef = (video) => { this.red5pro_multistream = video }
       return (
         <View style={styles.container}>
           <R5MultiStreamView
@@ -132,6 +159,54 @@ export default class App extends React.Component {
         <Text>Waiting for permissions...</Text>
       </View>
     )
+  }
+
+  _updateSubscriberList (json) {
+    console.log(json)
+    const mystream = this.state.streamName
+    const currentStreamList = this.state.subscriberList
+    const availableSubscribers = json.filter((stream, index) => {
+      let isSubscribing = false
+      let index = currentStreamList.length
+      while(--index > -1) {
+        isSubscribing = currentStreamList[index].name === stream.name
+      }
+      return stream.name !== mystream && !isSubscribing
+    })
+
+    console.log(availableSubscribers)
+    if (availableSubscribers.length > 0) {
+      this.setState({
+        subscriberList: [...currentList, availableSubscribers]
+      })
+    }
+
+    let timeout = setTimeout(() => {
+      clearTimeout(timeout)
+      this._checkForSubscriptionStreams(streamlistURL)
+    }, 5000)
+
+  }
+
+  _checkForSubscriptionStreams (url) {
+    fetch(url, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      }
+    })
+    .then((response) => response.json())
+    .then((json) => {
+      if (json.errorMessage) {
+        console.error(json.errorMessage)
+      } else {
+        this._updateSubscriberList(json)
+      }
+    })
+    .catch((error) => {
+      console.log(error)
+    })
   }
 
   requestPermissions () {
@@ -222,17 +297,17 @@ export default class App extends React.Component {
   }
 
   onPublish () {
-    const randomId = `red5pro-${Math.floor(Math.random() * 0x10000).toString(16)}`
+    const randomId = Math.floor(Math.random() * 0x10000).toString(16)
     this.setState({
-      streamName: 'videoStream' + randomId,
+      streamName: 'red5pro-videoStream-' + randomId,
       publisherSelection: PubType.VIDEO
     })
   }
 
   onPublishAudio () {
-    const randomId = `red5pro-${Math.floor(Math.random() * 0x10000).toString(16)}`
+    const randomId = Math.floor(Math.random() * 0x10000).toString(16)
     this.setState({
-      streamName: 'audioStream' + randomId,
+      streamName: 'red5pro-audioStream-' + randomId,
       publisherSelection: PubType.AUDIO
     })
   }
@@ -241,7 +316,7 @@ export default class App extends React.Component {
   }
 
   onStop () {
-    unpublish(findNodeHandle(this.red5provideo_publisher), this.state.streamName)
+    unpublish(findNodeHandle(this.red5pro_multistream), this.state.streamName)
     this.setState({
       streamName: undefined,
       publisherSelection: PubType.NONE
