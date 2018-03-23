@@ -14,7 +14,8 @@ import {
   subscribe,
   unsubscribe,
   publish,
-  unpublish
+  unpublish,
+  shutdown
 } from 'react-native-red5pro-multistream'
 
 const host = '18.218.79.30'
@@ -37,6 +38,8 @@ const isValidStatusMessage = (value) => {
 export default class App extends React.Component {
   constructor (props) {
     super(props)
+
+    this.streamCheckTimer = 0
 
     // Events.
     this.onMetaData = this.onMetaData.bind(this)
@@ -106,14 +109,19 @@ export default class App extends React.Component {
     const currentLength = currentSubs.length;
     const nextSubs = nextState.subscriberList
     if (currentLength < nextSubs.length) {
-      const newSubs = nextSubs.slice(currentLength - 1)
+      const newSubs = currentLength > 0 ? nextSubs.slice(currentLength - 1) : nextSubs
       newSubs.map((sub, index) => {
         const withVideo = sub.name.match(/video/)
+        const withAudio = sub.name.match(/audio/)
+        if (!withVideo && !withAudio) {
+          return false
+        }
+        console.log('SUBSCRIBE', sub)
         subscribe(findNodeHandle(this.red5pro_multistream),
           sub.name,
           sub.serverAddress,
-          sub.scope,
-          withVideo)
+          sub.scope.substring(1, sub.scope.length),
+          withVideo === null ? false : true)
       })
     } else if (currentLength > nextSubs.length) {
       // TODO: unsubscribe
@@ -121,8 +129,9 @@ export default class App extends React.Component {
   }
 
   componentDidUpdate (prevProps, prevState) {
-    if (prevState.publisherSelecion !== this.state.publisherSelection &&
+    if (prevState.publisherSelection !== this.state.publisherSelection &&
         this.state.publisherSelection !== PubType.NONE) {
+      console.log('PUBLISH', this.state.streamName)
       const withVideo = this.state.publisherSelection === PubType.VIDEO
       publish(findNodeHandle(this.red5pro_multistream),
         this.state.streamName,
@@ -136,13 +145,21 @@ export default class App extends React.Component {
   render() {
     if (this.state.hasPermissions && this.state.publisherSelection !== PubType.NONE) {
       const assignVideoRef = (video) => { this.red5pro_multistream = video }
+      const subscribers = this.state.subscriberList.map((subscriber, index) => {
+        return (
+          <View key={`subscriber-${index}`} style={styles.subscriberTag}>
+            <Text>{subscriber.name}</Text>
+          </View>
+        )
+      })
       return (
         <View style={styles.container}>
           <R5MultiStreamView
             ref={assignVideoRef}
             {...this.state.videoProps} 
           />
-          <Button title="Stop" onPress={this.onStop} />
+          {subscribers}
+          <Button title="Stop" onPress={this.onStop} style={{ flex: 1, height: 60, flexBasis: 60 }} />
         </View>
       )
     } else if (this.state.hasPermissions) {
@@ -162,27 +179,27 @@ export default class App extends React.Component {
   }
 
   _updateSubscriberList (json) {
-    console.log(json)
     const mystream = this.state.streamName
     const currentStreamList = this.state.subscriberList
     const availableSubscribers = json.filter((stream, index) => {
-      let isSubscribing = false
-      let index = currentStreamList.length
-      while(--index > -1) {
-        isSubscribing = currentStreamList[index].name === stream.name
+      const withVideo = stream.name.match(/video/)
+      const withAudio = stream.name.match(/audio/)
+      let i = currentStreamList.length
+      while (--i > -1) {
+        if (currentStreamList[i].name === stream.name) {
+          return false
+        }
       }
-      return stream.name !== mystream && !isSubscribing
+      return stream.name !== mystream && (withVideo || withAudio)
     })
-
-    console.log(availableSubscribers)
     if (availableSubscribers.length > 0) {
       this.setState({
-        subscriberList: [...currentList, availableSubscribers]
+        subscriberList: currentStreamList.concat(availableSubscribers)
       })
     }
 
-    let timeout = setTimeout(() => {
-      clearTimeout(timeout)
+    this.streamCheckTimer = setTimeout(() => {
+      clearTimeout(this.streamCheckTimer)
       this._checkForSubscriptionStreams(streamlistURL)
     }, 5000)
 
@@ -196,12 +213,22 @@ export default class App extends React.Component {
         'Content-Type': 'application/json'
       }
     })
-    .then((response) => response.json())
+    .then(function (res) {
+      if (res.headers.get('content-type') &&
+          res.headers.get('content-type').toLowerCase().indexOf('application/json') >= 0) {
+        return res.json()
+      }
+      else {
+        return res.text()
+      }
+    })
     .then((json) => {
       if (json.errorMessage) {
         console.error(json.errorMessage)
       } else {
-        this._updateSubscriberList(json)
+        const list = typeof json === 'string' ? JSON.parse(json) : json
+        list.map((arr, index) => arr.constructor === Array ? arr[0] : arr)
+        this._updateSubscriberList(list)
       }
     })
     .catch((error) => {
@@ -247,6 +274,7 @@ export default class App extends React.Component {
   }
 
   onPublisherStreamStatus (event) {
+    console.log(event.nativeEvent)
     console.log(`onPublisherStreamStatus :: ${JSON.stringify(event.nativeEvent.status, null, 2)}`)
     const status = event.nativeEvent.status
     let message = isValidStatusMessage(status.message) ? status.message : status.name
@@ -316,9 +344,12 @@ export default class App extends React.Component {
   }
 
   onStop () {
-    unpublish(findNodeHandle(this.red5pro_multistream), this.state.streamName)
+    //    unpublish(findNodeHandle(this.red5pro_multistream), this.state.streamName)
+    clearTimeout(this.streamCheckTimer)
+    shutdown(findNodeHandle(this.red5pro_multistream))
     this.setState({
       streamName: undefined,
+      subscriberList: [],
       publisherSelection: PubType.NONE
     })
   }
@@ -336,5 +367,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     // justifyContent: 'center',
     backgroundColor: 'black'
+  },
+  subscriberTag: {
+    flex: 0,
+    flexBasis: 20,
+    flexDirection: 'row',
+    alignContent: 'center',
+    alignItems: 'center'
   }
 })

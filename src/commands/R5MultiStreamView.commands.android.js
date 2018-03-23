@@ -15,7 +15,8 @@ export const subscribe = (handle, streamName,
     streamName,
     host,
     context,
-    withVideo])
+    withVideo,
+    audioMode])
 }
 
 export const unsubscribe = (handle, streamName) => {
@@ -70,5 +71,5 @@ export const updateScaleSize = (handle,
 }
 
 export const shutdown = (handle) => {
-  UIManager.dispatchViewManagerCommand(handle, Commands.swapCamera, [streamName])
+  UIManager.dispatchViewManagerCommand(handle, Commands.shutdown, [])
 }

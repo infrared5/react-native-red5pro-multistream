@@ -188,7 +188,7 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
                 streamType,
                 mUseAdaptiveBitrateController);
         publisher.start();
-        
+
         streamMap.put(streamName, publisher);
         onConfigured(streamName, streamName + this.getId());
 
