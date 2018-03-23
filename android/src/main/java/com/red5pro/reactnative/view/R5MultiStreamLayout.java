@@ -148,9 +148,7 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
         SubscriberStream subscriber = new SubscriberStream(mContext, this, withVideo ? createVideoView() : null);
         subscriber.init(createConfiguration(streamName, host, context));
         subscriber.start();
-        if (subscriber.getView() != null) {
-            subscriber.updateScaleSize(mClientWidth, mClientHeight, mClientScreenWidth, mClientScreenHeight);
-        }
+
         streamMap.put(streamName, subscriber);
         onConfigured(streamName, streamName + this.getId());
 
@@ -163,6 +161,10 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
             if (stream instanceof SubscriberStream) {
                 stream.stop();
             }
+            if (stream.getView() != null) {
+                removeView(stream.getView());
+            }
+            streamMap.remove(streamName);
         }
 
     }
@@ -200,7 +202,11 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
             Stream stream = streamMap.get(streamName);
             if (stream instanceof PublisherStream) {
                 stream.stop();
+                if (stream.getView() != null) {
+                    removeView(stream.getView());
+                }
             }
+            streamMap.remove(streamName);
         }
 
     }
@@ -241,6 +247,7 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
             Stream stream = (Stream)(entry.getValue());
             stream.stop();
         }
+        streamMap.clear();
 
     }
 

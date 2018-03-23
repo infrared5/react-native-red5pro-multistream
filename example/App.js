@@ -1,6 +1,7 @@
 import React from 'react'
 import {
   findNodeHandle,
+  Alert,
   Button,
   StyleSheet,
   Text,
@@ -18,12 +19,12 @@ import {
   shutdown
 } from 'react-native-red5pro-multistream'
 
-const host = '18.218.79.30'
-const licenseKey = 'IBBB-LOPP-I32M-UIOS'
+const host = ''
+const licenseKey = ''
 const bundleID = 'com.red5pro.multistream'
 
-const streamlistURL = 'https://nafarat.red5.org/streammanager/api/2.0/event/list'
-const subscribeURL = 'https://nafarat.red5.org/streammanager/api/2.0/event/live/{streamName}?action=subscribe'
+const streamlistURL = 'https://${sm-host}/streammanager/api/2.0/event/list'
+const subscribeURL = 'https://${sm-host}/streammanager/api/2.0/event/live/{streamName}?action=subscribe'
 
 const PubType = {
   NONE: 0,
@@ -40,6 +41,7 @@ export default class App extends React.Component {
     super(props)
 
     this.streamCheckTimer = 0
+    this.bannedList = []
 
     // Events.
     this.onMetaData = this.onMetaData.bind(this)
@@ -77,6 +79,7 @@ export default class App extends React.Component {
         configuration: {
           host: host
         },
+        showDebug: true,
         logLevel: R5LogLevel.DEBUG,
         onMetaData: this.onMetaData,
         onConfigured: this.onConfigured,
@@ -111,8 +114,8 @@ export default class App extends React.Component {
     if (currentLength < nextSubs.length) {
       const newSubs = currentLength > 0 ? nextSubs.slice(currentLength - 1) : nextSubs
       newSubs.map((sub, index) => {
-        const withVideo = sub.name.match(/video/)
-        const withAudio = sub.name.match(/audio/)
+        const withVideo = sub.name.match(/r5pro-video/)
+        const withAudio = sub.name.match(/r5pro-audio/)
         if (!withVideo && !withAudio) {
           return false
         }
@@ -182,8 +185,8 @@ export default class App extends React.Component {
     const mystream = this.state.streamName
     const currentStreamList = this.state.subscriberList
     const availableSubscribers = json.filter((stream, index) => {
-      const withVideo = stream.name.match(/video/)
-      const withAudio = stream.name.match(/audio/)
+      const withVideo = stream.name.match(/r5pro-video/)
+      const withAudio = stream.name.match(/r5pro-audio/)
       let i = currentStreamList.length
       while (--i > -1) {
         if (currentStreamList[i].name === stream.name) {
@@ -278,6 +281,10 @@ export default class App extends React.Component {
     console.log(`onPublisherStreamStatus :: ${JSON.stringify(event.nativeEvent.status, null, 2)}`)
     const status = event.nativeEvent.status
     let message = isValidStatusMessage(status.message) ? status.message : status.name
+    if (status.name === 'ERROR') {
+      this.bannedList.push(streamName)
+      Alert('Stream Error', `${streamName}: ${message}`)
+    }
       /*
     if (!this.state.inErrorState) {
       this.setState({
@@ -290,8 +297,22 @@ export default class App extends React.Component {
 
   onSubscriberStreamStatus (event) {
     console.log(`onSubscriberStreamStatus :: ${JSON.stringify(event.nativeEvent.status, null, 2)}`)
-    const status = event.nativeEvent.status
+    const { status, streamName } = event.nativeEvent
     let message = isValidStatusMessage(status.message) ? status.message : status.name
+    if (status.name === 'CLOSE' ||
+        (status.name === 'NET_STATUS' && status.message === 'NetStream.Play.UnpublishNotify')) {
+      unsubscribe(findNodeHandle(this.red5pro_multistream), streamName)
+      const streams = this.state.subscriberList.filter((sub, index) => {
+        return sub.name !== streamName
+      })
+      this.setState({
+        subscriberList: streams
+      })
+    }
+    else if (status.name === 'ERROR') {
+      this.bannedList.push(streamName)
+      Alert('Stream Error', `${streamName}: ${message}`)
+    }
       /*
     if (!this.state.inErrorState) {
       this.setState({
@@ -327,7 +348,7 @@ export default class App extends React.Component {
   onPublish () {
     const randomId = Math.floor(Math.random() * 0x10000).toString(16)
     this.setState({
-      streamName: 'red5pro-videoStream-' + randomId,
+      streamName: 'r5pro-videoStream-' + randomId,
       publisherSelection: PubType.VIDEO
     })
   }
@@ -335,7 +356,7 @@ export default class App extends React.Component {
   onPublishAudio () {
     const randomId = Math.floor(Math.random() * 0x10000).toString(16)
     this.setState({
-      streamName: 'red5pro-audioStream-' + randomId,
+      streamName: 'r5pro-audioStream-' + randomId,
       publisherSelection: PubType.AUDIO
     })
   }

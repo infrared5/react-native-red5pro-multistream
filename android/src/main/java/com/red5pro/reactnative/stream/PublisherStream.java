@@ -69,14 +69,17 @@ public class PublisherStream implements Stream, R5ConnectionListener {
             mStream = null;
         }
 
-        if (mConnection != null) {
-            mConnection.removeListener();
-            mConnection = null;
-        }
-        if (mVideoView != null) {
-            mVideoView.attachStream(null);
-            mVideoView = null;
-        }
+//        if (mConnection != null) {
+//            mConnection.removeListener();
+//            mConnection = null;
+//        }
+//        if (mVideoView != null) {
+//            mVideoView.attachStream(null);
+//            mVideoView = null;
+//        }
+
+        mMicrophone = null;
+//        mVideoView = null;
 
         mIsStreaming = false;
 
@@ -221,6 +224,8 @@ public class PublisherStream implements Stream, R5ConnectionListener {
         mConnection = new R5Connection(configuration);
         mStream = new R5Stream(mConnection);
 
+        Log.d("PublisherStream", ":init (" + mStreamName + ")!");
+
         mStream.setListener(this);
         mStream.client = this;
 
@@ -323,6 +328,7 @@ public class PublisherStream implements Stream, R5ConnectionListener {
     @Override
     public void start() {
 
+        Log.d("PublisherStream", ":start (" + mStreamName + ")");
         mStream.publish(mStreamName, mStreamType);
 
         if (mCamera != null) {
@@ -334,9 +340,11 @@ public class PublisherStream implements Stream, R5ConnectionListener {
     @Override
     public void stop() {
 
-        if (mVideoView != null) {
-            mVideoView.attachStream(null);
-        }
+        Log.d("PublisherStream", ":stop (" + mStreamName + ")");
+
+//        if (mVideoView != null) {
+//            mVideoView.attachStream(null);
+//        }
 
         if (mCamera != null) {
             Camera c = mCamera.getCamera();
@@ -345,14 +353,14 @@ public class PublisherStream implements Stream, R5ConnectionListener {
             mCamera = null;
         }
 
-        mMicrophone = null;
-
         if (mStream != null && mIsStreaming) {
             mStream.stop();
         }
         else {
+
             WritableMap map = Arguments.createMap();
             mEventEmitter.dispatchEvent(mStreamName, R5MultiStreamLayout.Events.UNPUBLISH_NOTIFICATION.toString(), map);
+            Log.d("PublisherStream", ":unpublishNotify (" + mStreamName + ")");
             cleanup();
         }
 
@@ -424,7 +432,7 @@ public class PublisherStream implements Stream, R5ConnectionListener {
         else if (event == R5ConnectionEvent.DISCONNECTED && mIsStreaming) {
             WritableMap evt = new WritableNativeMap();
             mEventEmitter.dispatchEvent(mStreamName, R5MultiStreamLayout.Events.UNPUBLISH_NOTIFICATION.toString(), evt);
-            Log.d("Publisher", "DISCONNECT");
+            Log.d("PublisherStream", "DISCONNECT");
             cleanup();
             mIsStreaming = false;
         }
