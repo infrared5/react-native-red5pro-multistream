@@ -219,6 +219,13 @@ public class PublisherStream implements Stream, R5ConnectionListener {
 
     }
 
+    public void onMetaData(String metadata) {
+
+        WritableMap map = new WritableNativeMap();
+        map.putString("metadata", metadata);
+        mEventEmitter.dispatchEvent(mStreamName, R5MultiStreamLayout.Events.METADATA.toString(), map);
+
+    }
 
     public void init(R5Configuration configuration,
                      int cameraWidth, int cameraHeight,
@@ -451,3 +458,4 @@ public class PublisherStream implements Stream, R5ConnectionListener {
     }
 
 }
+
