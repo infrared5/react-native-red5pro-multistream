@@ -115,6 +115,7 @@ public class SubscriberStream implements Stream, R5ConnectionListener {
 //        }
 
         if (mStream != null && mIsStreaming) {
+            mStream.client = null;
             mStream.stop();
         }
         else {

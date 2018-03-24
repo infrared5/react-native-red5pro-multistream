@@ -177,7 +177,7 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
                          int cameraHeight,
                          R5Stream.RecordType streamType) {
 
-        Log.d("R5MultiStreamLayout", "publish");
+        Log.d("R5MultiStreamLayout", "publish with video(" + withVideo + ")");
 
         if (mLayoutListener == null) {
             mLayoutListener = setUpOrientationListener();
@@ -242,6 +242,8 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
 
     public void shutdown() {
 
+        Log.d("R5MultiStreamLayout", "shutdown()");
+        
         for(Map.Entry<String, Stream>entry : streamMap.entrySet()) {
             String key = entry.getKey();
             Stream stream = (Stream)(entry.getValue());
@@ -291,22 +293,6 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
         map.putString("streamName", streamName);
         map.putString("key", key);
         mEventEmitter.receiveEvent(this.getId(), "onConfigured", map);
-    }
-
-    public void onMetaData(String streamName, String metadata) {
-
-        String[] props = metadata.split(";");
-        for (String s : props) {
-            String[] kv = s.split("=");
-            if (kv[0].equalsIgnoreCase("orientation")) {
-                updateOrientation(Integer.parseInt(kv[1]));
-            }
-        }
-        WritableMap map = new WritableNativeMap();
-        map.putString("streamName", streamName);
-        map.putString("metadata", metadata);
-        mEventEmitter.receiveEvent(this.getId(), Events.METADATA.toString(), map);
-
     }
 
     @Override
@@ -417,3 +403,4 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
      */
 
 }
+
