@@ -348,13 +348,15 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
         for(Map.Entry<String, Stream>entry : streamMap.entrySet()) {
             String key = entry.getKey();
             Stream stream = (Stream)(entry.getValue());
+            R5VideoView view = null;
             if (stream instanceof PublisherStream) {
                 publisher = ((PublisherStream) stream);
-//                if (stream.getView() != null) {
-//                    removeView(stream.getView());
-//                }
+                view = publisher.getView();
             }
             stream.stop();
+            if (view != null) {
+                removeView(view);
+            }
         }
         if (publisher != null) {
             streamMap.remove(publisher);
