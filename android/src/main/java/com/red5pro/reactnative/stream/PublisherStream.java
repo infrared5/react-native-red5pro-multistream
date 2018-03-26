@@ -372,8 +372,8 @@ public class PublisherStream implements Stream, R5ConnectionListener {
         if (mStream != null) {
             mStream.client = null;
 
-            Camera c = (mStream.getVideoSource() != null) ?
-                    ((R5Camera) mStream.getVideoSource()).getCamera() : mCamera.getCamera();
+             Camera c = (mStream.getVideoSource() != null) ?
+                    ((R5Camera) mStream.getVideoSource()).getCamera() : (mCamera != null) ? mCamera.getCamera() : null;
             if(c != null) {
                 Log.d("PublisherStream", ":>>releaseCamera (" + mStreamName + ")");
                 c.stopPreview();
