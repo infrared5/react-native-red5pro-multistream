@@ -360,20 +360,49 @@ public class PublisherStream implements Stream, R5ConnectionListener {
 
         Log.d("PublisherStream", ":stop (" + mStreamName + ")");
 
-//        if (mVideoView != null) {
-//            mVideoView.attachStream(null);
+//        if (mCamera != null) {
+//
+//            Camera c = mCamera.getCamera();
+//            c.stopPreview();
+//            c.release();
+//            mCamera = null;
+//
 //        }
 
-        if (mCamera != null) {
-            Camera c = mCamera.getCamera();
-            c.stopPreview();
-            c.release();
-            mCamera = null;
-        }
-
-        if (mStream != null && mIsStreaming) {
+        if (mStream != null) {
             mStream.client = null;
+
+            Camera c = (mStream.getVideoSource() != null) ?
+                    ((R5Camera) mStream.getVideoSource()).getCamera() : (mCamera != null) ? mCamera.getCamera() : null;
+            if(c != null) {
+                Log.d("PublisherStream", ":>>releaseCamera (" + mStreamName + ")");
+                c.stopPreview();
+                c.release();
+                try {
+                    Log.d("PublisherStream", "attachNullCamera...");
+                    mStream.attachCamera(null);
+                } catch (Exception e) {
+                    // Attempted to clean out camera to avoid onResume crash with camera still
+                    // in use by surface handler. not sure how it still gets there... but...
+                    e.printStackTrace();
+                }
+                try {
+                    Log.d("PublisherStream", "assignNullView");
+                    mStream.setView(null);
+                } catch (Exception e) {
+                    // Ditto.
+                    e.printStackTrace();
+                }
+                mCamera = null;
+                Log.d("PublisherStream", ":<<releaseCamera (" + mStreamName + ")");
+            }
+
+            if (mVideoView != null) {
+                mVideoView.attachStream(null);
+                mVideoView = null;
+            }
             mStream.stop();
+            mStream = null;
         }
         else {
 
@@ -383,6 +412,16 @@ public class PublisherStream implements Stream, R5ConnectionListener {
             cleanup();
         }
 
+//        if (mVideoView != null) {
+//            mVideoView.attachStream(null);
+//        }
+
+    }
+
+    @Override
+    public void pause () {
+        // same as stop for publishers.
+        this.stop();
     }
 
     @Override
@@ -457,7 +496,7 @@ public class PublisherStream implements Stream, R5ConnectionListener {
             WritableMap evt = new WritableNativeMap();
             mEventEmitter.dispatchEvent(mStreamName, R5MultiStreamLayout.Events.UNPUBLISH_NOTIFICATION.toString(), evt);
             Log.d("PublisherStream", "DISCONNECT");
-            cleanup();
+//            cleanup();
             mIsStreaming = false;
         }
 
