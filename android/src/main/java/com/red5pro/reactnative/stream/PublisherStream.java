@@ -422,6 +422,11 @@ public class PublisherStream implements Stream, R5ConnectionListener {
         // Nada. we shut down for good.
     }
 
+    @Override
+    public void resume () {
+        // Nada. we shut down for good.
+    }
+
     public void updateScaleSize(final int width, final int height, final int screenWidth, final int screenHeight) {
 
         if (mVideoView != null) {
