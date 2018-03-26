@@ -128,6 +128,12 @@ public class SubscriberStream implements Stream, R5ConnectionListener {
     }
 
     @Override
+    public void resume () {
+        this.init(mConfiguration);
+        this.start();
+    }
+
+    @Override
     public void updateScaleSize(final int width, final int height, final int screenWidth, final int screenHeight) {
 
         if (mVideoView != null) {
