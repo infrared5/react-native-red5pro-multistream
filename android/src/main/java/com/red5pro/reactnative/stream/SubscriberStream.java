@@ -199,7 +199,7 @@ public class SubscriberStream implements Stream, R5ConnectionListener {
             WritableMap evt = new WritableNativeMap();
             mEventEmitter.dispatchEvent(mStreamName, R5MultiStreamLayout.Events.UNSUBSCRIBE_NOTIFICATION.toString(), evt);
             Log.d("SubscriberStream", "DISCONNECT");
-            cleanup();
+            // cleanup();
             mIsStreaming = false;
         }
 

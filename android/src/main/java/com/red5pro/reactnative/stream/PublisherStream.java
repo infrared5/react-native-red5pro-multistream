@@ -372,16 +372,16 @@ public class PublisherStream implements Stream, R5ConnectionListener {
         if (mStream != null) {
             mStream.client = null;
 
-            if(mStream.getVideoSource() != null) {
+            Camera c = (mStream.getVideoSource() != null) ?
+                    ((R5Camera) mStream.getVideoSource()).getCamera() : mCamera.getCamera();
+            if(c != null) {
                 Log.d("PublisherStream", ":>>releaseCamera (" + mStreamName + ")");
-                Camera c = ((R5Camera) mStream.getVideoSource()).getCamera();
                 c.stopPreview();
                 c.release();
                 try {
                     Log.d("PublisherStream", "attachNullCamera...");
                     mStream.attachCamera(null);
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     // Attempted to clean out camera to avoid onResume crash with camera still
                     // in use by surface handler. not sure how it still gets there... but...
                     e.printStackTrace();
@@ -389,14 +389,14 @@ public class PublisherStream implements Stream, R5ConnectionListener {
                 try {
                     Log.d("PublisherStream", "assignNullView");
                     mStream.setView(null);
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     // Ditto.
                     e.printStackTrace();
                 }
                 mCamera = null;
                 Log.d("PublisherStream", ":<<releaseCamera (" + mStreamName + ")");
             }
+ 
             if (mVideoView != null) {
                 mVideoView.attachStream(null);
                 mVideoView = null;
@@ -489,7 +489,7 @@ public class PublisherStream implements Stream, R5ConnectionListener {
             WritableMap evt = new WritableNativeMap();
             mEventEmitter.dispatchEvent(mStreamName, R5MultiStreamLayout.Events.UNPUBLISH_NOTIFICATION.toString(), evt);
             Log.d("PublisherStream", "DISCONNECT");
-            cleanup();
+//            cleanup();
             mIsStreaming = false;
         }
 
