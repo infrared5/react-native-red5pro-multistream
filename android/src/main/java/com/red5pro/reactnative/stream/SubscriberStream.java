@@ -30,6 +30,7 @@ public class SubscriberStream implements Stream, R5ConnectionListener {
     protected String mStreamName;
     protected boolean mIsStreaming;
 
+    protected R5Configuration mConfiguration;
     protected R5Connection mConnection;
     protected R5Stream mStream;
     protected R5VideoView mVideoView;
@@ -50,7 +51,6 @@ public class SubscriberStream implements Stream, R5ConnectionListener {
 
         Log.d("SubscriberStream", ":cleanup (" + mStreamName + ")!");
         if (mStream != null) {
-            mStream.client = null;
             mStream.setListener(null);
             mStream = null;
         }
@@ -59,18 +59,22 @@ public class SubscriberStream implements Stream, R5ConnectionListener {
 //            mConnection.removeListener();
 //            mConnection = null;
 //        }
-//        if (mVideoView != null) {
-//            mVideoView.attachStream(null);
-//            mVideoView = null;
-//        }
-//        mVideoView = null;
 
         mIsStreaming = false;
 
     }
 
+    public void onMetaData(String metadata) {
+
+        WritableMap map = new WritableNativeMap();
+        map.putString("metadata", metadata);
+        mEventEmitter.dispatchEvent(mStreamName, R5MultiStreamLayout.Events.METADATA.toString(), map);
+
+    }
+
     public void init(R5Configuration configuration) {
 
+        mConfiguration = configuration;
         mStreamName = configuration.getStreamName();
         mConnection = new R5Connection(configuration);
         mStream = new R5Stream(mConnection);
@@ -102,11 +106,9 @@ public class SubscriberStream implements Stream, R5ConnectionListener {
     public void stop() {
 
         Log.d("SubscriberStream", ":stop (" + mStreamName + ")");
-//        if (mVideoView != null) {
-//            mVideoView.attachStream(null);
-//        }
 
-        if (mStream != null && mIsStreaming) {
+        if (mStream != null) {
+            mStream.client = null;
             mStream.stop();
         }
         else {
@@ -116,6 +118,17 @@ public class SubscriberStream implements Stream, R5ConnectionListener {
             cleanup();
         }
 
+//        if (mVideoView != null) {
+//            mVideoView.attachStream(null);
+//            mVideoView = null;
+//        }
+
+    }
+
+    @Override
+    public void resume () {
+        this.init(mConfiguration);
+        this.start();
     }
 
     @Override
@@ -186,10 +199,12 @@ public class SubscriberStream implements Stream, R5ConnectionListener {
             WritableMap evt = new WritableNativeMap();
             mEventEmitter.dispatchEvent(mStreamName, R5MultiStreamLayout.Events.UNSUBSCRIBE_NOTIFICATION.toString(), evt);
             Log.d("SubscriberStream", "DISCONNECT");
-            cleanup();
+            // cleanup();
             mIsStreaming = false;
         }
 
     }
 
 }
+
+

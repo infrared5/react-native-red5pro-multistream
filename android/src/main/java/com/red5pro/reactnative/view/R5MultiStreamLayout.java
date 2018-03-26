@@ -53,6 +53,8 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
     protected int mClientScreenWidth;
     protected int mClientScreenHeight;
 
+    private boolean isInBackground = false;
+
     protected View.OnLayoutChangeListener mLayoutListener;
 
     protected Map<String, Stream> streamMap;
@@ -145,16 +147,22 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
 
     public void subscribe (String streamName, String host, String context, Boolean withVideo, int audioMode) {
 
+        Log.d("[R5MultiStreamLayout]", "subscribe(" + streamName + ")");
+
         SubscriberStream subscriber = new SubscriberStream(mContext, this, withVideo ? createVideoView() : null);
         subscriber.init(createConfiguration(streamName, host, context));
-        subscriber.start();
-
         streamMap.put(streamName, subscriber);
+
+        if (!isInBackground) {
+            subscriber.start();
+        }
         onConfigured(streamName, streamName + this.getId());
 
     }
 
     public void unsubscribe (String streamName) {
+
+        Log.d("[R5MultiStreamLayout]", "unsubscribe(" + streamName + ")");
 
         if (streamMap.containsKey(streamName)) {
             Stream stream = streamMap.get(streamName);
@@ -177,7 +185,7 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
                          int cameraHeight,
                          R5Stream.RecordType streamType) {
 
-        Log.d("R5MultiStreamLayout", "publish");
+        Log.d("R5MultiStreamLayout", "publish with video(" + withVideo + ")");
 
         if (mLayoutListener == null) {
             mLayoutListener = setUpOrientationListener();
@@ -197,6 +205,8 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
     }
 
     public void unpublish (String streamName) {
+
+        Log.d("[R5MultiStreamLayout]", "unpublish(" + streamName + ")");
 
         if (streamMap.containsKey(streamName)) {
             Stream stream = streamMap.get(streamName);
@@ -225,6 +235,7 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
 
     public void updateScaleSize(String streamName, final int width, final int height, final int screenWidth, final int screenHeight) {
 
+        Log.d("[R5MultiStreamLayout]", "updateScaleSize(" + streamName + ")");
         mClientWidth = width;
         mClientHeight = height;
         mClientScreenWidth = screenWidth;
@@ -242,9 +253,14 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
 
     public void shutdown() {
 
+        Log.d("R5MultiStreamLayout", "shutdown()");
+
         for(Map.Entry<String, Stream>entry : streamMap.entrySet()) {
             String key = entry.getKey();
             Stream stream = (Stream)(entry.getValue());
+//            if (stream.getView() != null) {
+//                removeView(stream.getView());
+//            }
             stream.stop();
         }
         streamMap.clear();
@@ -286,27 +302,11 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
 
     protected void onConfigured(String streamName, String key) {
 
-        System.out.println("[R5MultiStreamLayout]:: onConfigured()");
+        Log.d("[R5MultiStreamLayout]", "onConfigured()");
         WritableMap map = new WritableNativeMap();
         map.putString("streamName", streamName);
         map.putString("key", key);
         mEventEmitter.receiveEvent(this.getId(), "onConfigured", map);
-    }
-
-    public void onMetaData(String streamName, String metadata) {
-
-        String[] props = metadata.split(";");
-        for (String s : props) {
-            String[] kv = s.split("=");
-            if (kv[0].equalsIgnoreCase("orientation")) {
-                updateOrientation(Integer.parseInt(kv[1]));
-            }
-        }
-        WritableMap map = new WritableNativeMap();
-        map.putString("streamName", streamName);
-        map.putString("metadata", metadata);
-        mEventEmitter.receiveEvent(this.getId(), Events.METADATA.toString(), map);
-
     }
 
     @Override
@@ -319,23 +319,52 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
 
     @Override
     public void onHostResume() {
+        Log.d("[R5MultiStreamLayout]", "onResume()");
+        isInBackground = false;
         Activity activity = mContext.getCurrentActivity();
         if (mLayoutListener == null) {
             mLayoutListener = setUpOrientationListener();
         }
         this.addOnLayoutChangeListener(mLayoutListener);
-    }
 
-    @Override
-    public void onHostPause() {
-        if (mLayoutListener != null) {
-            this.removeOnLayoutChangeListener(mLayoutListener);
+        for(Map.Entry<String, Stream>entry : streamMap.entrySet()) {
+            String key = entry.getKey();
+            Stream stream = (Stream)(entry.getValue());
+            if (stream instanceof SubscriberStream) {
+                ((SubscriberStream) stream).resume();
+            }
         }
     }
 
     @Override
+    public void onHostPause() {
+        Log.d("[R5MultiStreamLayout]", " onPause()");
+        isInBackground = true;
+        if (mLayoutListener != null) {
+            this.removeOnLayoutChangeListener(mLayoutListener);
+        }
+
+        PublisherStream publisher = null;
+        for(Map.Entry<String, Stream>entry : streamMap.entrySet()) {
+            String key = entry.getKey();
+            Stream stream = (Stream)(entry.getValue());
+            if (stream instanceof PublisherStream) {
+                publisher = ((PublisherStream) stream);
+//                if (stream.getView() != null) {
+//                    removeView(stream.getView());
+//                }
+            }
+            stream.stop();
+        }
+        if (publisher != null) {
+            streamMap.remove(publisher);
+        }
+
+    }
+
+    @Override
     public void onHostDestroy() {
-        //Log.d("R5MultiStreamLayout", "onHostDestroy");
+        Log.d("[R5MultiStreamLayout]", "onDestroy()");
     }
 
     @Override
@@ -417,3 +446,5 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
      */
 
 }
+
+

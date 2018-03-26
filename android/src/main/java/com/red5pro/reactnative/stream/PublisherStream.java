@@ -87,23 +87,34 @@ public class PublisherStream implements Stream, R5ConnectionListener {
 
     protected void setupCamera(int width, int height, int bitrate, int framerate) {
 
-        Camera device = mUseBackfacingCamera
-                ? openBackFacingCameraGingerbread()
-                : openFrontFacingCameraGingerbread();
+        try {
+            Camera device = mUseBackfacingCamera
+                    ? openBackFacingCameraGingerbread()
+                    : openFrontFacingCameraGingerbread();
 
-        updateDeviceOrientationOnLayoutChange();
-        int rotate = mUseBackfacingCamera ? 0 : 180;
-        device.setDisplayOrientation((mCameraOrientation + rotate) % 360);
+            updateDeviceOrientationOnLayoutChange();
+            int rotate = mUseBackfacingCamera ? 0 : 180;
+            device.setDisplayOrientation((mCameraOrientation + rotate) % 360);
 
-        R5Camera camera = new R5Camera(device, width, height);
-        camera.setBitrate(bitrate);
-        camera.setOrientation(mCameraOrientation);
-        camera.setFramerate(framerate);
+            R5Camera camera = new R5Camera(device, width, height);
+            camera.setBitrate(bitrate);
+            camera.setOrientation(mCameraOrientation);
+            camera.setFramerate(framerate);
 
-        mCamera = camera;
-        Camera.Parameters params = mCamera.getCamera().getParameters();
-        params.setRecordingHint(true);
-        mCamera.getCamera().setParameters(params);
+            mCamera = camera;
+            Camera.Parameters params = mCamera.getCamera().getParameters();
+            params.setRecordingHint(true);
+            mCamera.getCamera().setParameters(params);
+        }
+        catch(Exception e) {
+            WritableMap map = new WritableNativeMap();
+            WritableMap statusMap = new WritableNativeMap();
+            statusMap.putInt("code", R5ConnectionEvent.ERROR.value());
+            statusMap.putString("message", "Camera Issue. " + e.getMessage());
+            statusMap.putString("name", R5ConnectionEvent.ERROR.name());
+            map.putMap("status", statusMap);
+            mEventEmitter.dispatchEvent(mStreamName, R5MultiStreamLayout.Events.PUBLISHER_STATUS.toString(), map);
+        }
 
     }
 
@@ -208,6 +219,13 @@ public class PublisherStream implements Stream, R5ConnectionListener {
 
     }
 
+    public void onMetaData(String metadata) {
+
+        WritableMap map = new WritableNativeMap();
+        map.putString("metadata", metadata);
+        mEventEmitter.dispatchEvent(mStreamName, R5MultiStreamLayout.Events.METADATA.toString(), map);
+
+    }
 
     public void init(R5Configuration configuration,
                      int cameraWidth, int cameraHeight,
@@ -342,18 +360,47 @@ public class PublisherStream implements Stream, R5ConnectionListener {
 
         Log.d("PublisherStream", ":stop (" + mStreamName + ")");
 
-//        if (mVideoView != null) {
-//            mVideoView.attachStream(null);
+//        if (mCamera != null) {
+//
+//            Camera c = mCamera.getCamera();
+//            c.stopPreview();
+//            c.release();
+//            mCamera = null;
+//
 //        }
 
-        if (mCamera != null) {
-            Camera c = mCamera.getCamera();
-            c.stopPreview();
-            c.release();
-            mCamera = null;
-        }
+        if (mStream != null) {
+            mStream.client = null;
 
-        if (mStream != null && mIsStreaming) {
+             Camera c = (mStream.getVideoSource() != null) ?
+                    ((R5Camera) mStream.getVideoSource()).getCamera() : (mCamera != null) ? mCamera.getCamera() : null;
+            if(c != null) {
+                Log.d("PublisherStream", ":>>releaseCamera (" + mStreamName + ")");
+                c.stopPreview();
+                c.release();
+                try {
+                    Log.d("PublisherStream", "attachNullCamera...");
+                    mStream.attachCamera(null);
+                } catch (Exception e) {
+                    // Attempted to clean out camera to avoid onResume crash with camera still
+                    // in use by surface handler. not sure how it still gets there... but...
+                    e.printStackTrace();
+                }
+                try {
+                    Log.d("PublisherStream", "assignNullView");
+                    mStream.setView(null);
+                } catch (Exception e) {
+                    // Ditto.
+                    e.printStackTrace();
+                }
+                mCamera = null;
+                Log.d("PublisherStream", ":<<releaseCamera (" + mStreamName + ")");
+            }
+ 
+            if (mVideoView != null) {
+                mVideoView.attachStream(null);
+                mVideoView = null;
+            }
             mStream.stop();
         }
         else {
@@ -364,6 +411,15 @@ public class PublisherStream implements Stream, R5ConnectionListener {
             cleanup();
         }
 
+//        if (mVideoView != null) {
+//            mVideoView.attachStream(null);
+//        }
+
+    }
+
+    @Override
+    public void resume () {
+        // Nada. we shut down for good.
     }
 
     public void updateScaleSize(final int width, final int height, final int screenWidth, final int screenHeight) {
@@ -433,10 +489,11 @@ public class PublisherStream implements Stream, R5ConnectionListener {
             WritableMap evt = new WritableNativeMap();
             mEventEmitter.dispatchEvent(mStreamName, R5MultiStreamLayout.Events.UNPUBLISH_NOTIFICATION.toString(), evt);
             Log.d("PublisherStream", "DISCONNECT");
-            cleanup();
+//            cleanup();
             mIsStreaming = false;
         }
 
     }
 
 }
+
