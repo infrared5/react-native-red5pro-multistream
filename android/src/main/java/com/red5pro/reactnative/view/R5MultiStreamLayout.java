@@ -353,7 +353,7 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
                 publisher = ((PublisherStream) stream);
                 view = publisher.getView();
             }
-            stream.stop();
+            stream.pause();
             if (view != null) {
                 removeView(view);
             }

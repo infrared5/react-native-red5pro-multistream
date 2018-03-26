@@ -21,8 +21,8 @@ import {
   updateScaleSize
 } from 'react-native-red5pro-multistream'
 
-const host = '18.218.79.30'
-const licenseKey = 'ACGE-4UMR-UHM4-RVJR'
+const host = 'ADD YOUR HOST'
+const licenseKey = 'ADD YOUR PROD KEY'
 const bundleID = 'com.red5pro.multistream'
 
 const streamlistURL = 'https://nafarat.red5.org/streammanager/api/2.0/event/list'

@@ -126,9 +126,12 @@ public class SubscriberStream implements Stream, R5ConnectionListener {
     }
 
     @Override
-    public void resume () {
-        this.init(mConfiguration);
-        this.start();
+    public void pause () {
+        // Removing the listener will allow us to stop but not send close events down, which cause unsubscribe.
+        if (mStream != null) {
+            mStream.removeListener();
+        }
+        this.stop();
     }
 
     @Override
@@ -205,7 +208,7 @@ public class SubscriberStream implements Stream, R5ConnectionListener {
             WritableMap evt = new WritableNativeMap();
             mEventEmitter.dispatchEvent(mStreamName, R5MultiStreamLayout.Events.UNSUBSCRIBE_NOTIFICATION.toString(), evt);
             Log.d("SubscriberStream", "DISCONNECT");
-            // cleanup();
+//            cleanup();
             mIsStreaming = false;
         }
 

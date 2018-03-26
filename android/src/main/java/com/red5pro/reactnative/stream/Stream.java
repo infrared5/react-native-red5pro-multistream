@@ -11,6 +11,7 @@ public interface Stream {
 
     public void start();
     public void stop();
+    public void pause();
     public void resume();
 
     public void updateScaleSize(final int width, final int height, final int screenWidth, final int screenHeight);

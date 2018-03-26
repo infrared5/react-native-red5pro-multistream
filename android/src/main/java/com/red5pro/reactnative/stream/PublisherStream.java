@@ -372,7 +372,7 @@ public class PublisherStream implements Stream, R5ConnectionListener {
         if (mStream != null) {
             mStream.client = null;
 
-             Camera c = (mStream.getVideoSource() != null) ?
+            Camera c = (mStream.getVideoSource() != null) ?
                     ((R5Camera) mStream.getVideoSource()).getCamera() : (mCamera != null) ? mCamera.getCamera() : null;
             if(c != null) {
                 Log.d("PublisherStream", ":>>releaseCamera (" + mStreamName + ")");
@@ -396,12 +396,13 @@ public class PublisherStream implements Stream, R5ConnectionListener {
                 mCamera = null;
                 Log.d("PublisherStream", ":<<releaseCamera (" + mStreamName + ")");
             }
- 
+
             if (mVideoView != null) {
                 mVideoView.attachStream(null);
                 mVideoView = null;
             }
             mStream.stop();
+            mStream = null;
         }
         else {
 
@@ -418,8 +419,9 @@ public class PublisherStream implements Stream, R5ConnectionListener {
     }
 
     @Override
-    public void resume () {
-        // Nada. we shut down for good.
+    public void pause () {
+        // same as stop for publishers.
+        this.stop();
     }
 
     @Override
