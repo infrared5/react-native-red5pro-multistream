@@ -3,6 +3,7 @@ import {
   findNodeHandle,
   Alert,
   Button,
+  Dimensions,
   StyleSheet,
   Text,
   View
@@ -16,15 +17,18 @@ import {
   unsubscribe,
   publish,
   unpublish,
-  shutdown
+  shutdown,
+  updateScaleSize
 } from 'react-native-red5pro-multistream'
 
-const host = ''
-const licenseKey = ''
+const host = '18.218.79.30'
+const licenseKey = 'ACGE-4UMR-UHM4-RVJR'
 const bundleID = 'com.red5pro.multistream'
 
-const streamlistURL = 'https://${sm-host}/streammanager/api/2.0/event/list'
+const streamlistURL = 'https://nafarat.red5.org/streammanager/api/2.0/event/list'
 const subscribeURL = 'https://${sm-host}/streammanager/api/2.0/event/live/{streamName}?action=subscribe'
+
+const window = Dimensions.get('window')
 
 const PubType = {
   NONE: 0,
@@ -56,11 +60,13 @@ export default class App extends React.Component {
     this.onPublishAudio = this.onPublishAudio.bind(this)
     this.onSubscribe = this.onSubscribe.bind(this)
     this.onStop = this.onStop.bind(this)
+    this.onToggle = this.onToggle.bind(this)
 
     this._checkForSubscriptionStreams = this._checkForSubscriptionStreams.bind(this)
     this._updateSubscriberList = this._updateSubscriberList.bind(this)
 
     this.state = {
+      toggled: false,
       hasPermissions: false,
       publisherSelection: PubType.NONE,
       streamName: undefined,
@@ -162,6 +168,7 @@ export default class App extends React.Component {
             {...this.state.videoProps} 
           />
           {subscribers}
+          <Button title="Toggle" onPress={this.onToggle} style={{ flex: 1, height: 60, flexBasis: 60 }} />
           <Button title="Stop" onPress={this.onStop} style={{ flex: 1, height: 60, flexBasis: 60 }} />
         </View>
       )
@@ -277,9 +284,8 @@ export default class App extends React.Component {
   }
 
   onPublisherStreamStatus (event) {
-    console.log(event.nativeEvent)
-    console.log(`onPublisherStreamStatus :: ${JSON.stringify(event.nativeEvent.status, null, 2)}`)
-    const status = event.nativeEvent.status
+    const { status, streamName } = event.nativeEvent
+    console.log(`onPublisherStreamStatus :: ${JSON.stringify(status, null, 2)}`)
     let message = isValidStatusMessage(status.message) ? status.message : status.name
     if (status.name === 'ERROR') {
       this.bannedList.push(streamName)
@@ -296,8 +302,8 @@ export default class App extends React.Component {
   }
 
   onSubscriberStreamStatus (event) {
-    console.log(`onSubscriberStreamStatus :: ${JSON.stringify(event.nativeEvent.status, null, 2)}`)
     const { status, streamName } = event.nativeEvent
+    console.log(`onSubscriberStreamStatus :: ${JSON.stringify(status, null, 2)}`)
     let message = isValidStatusMessage(status.message) ? status.message : status.name
     if (status.name === 'CLOSE' ||
         (status.name === 'NET_STATUS' && status.message === 'NetStream.Play.UnpublishNotify')) {
@@ -374,7 +380,15 @@ export default class App extends React.Component {
       publisherSelection: PubType.NONE
     })
   }
-  
+
+  onToggle () {
+    if (this.state.toggled) {
+      updateScaleSize(findNodeHandle(this.red5pro_multistream), this.state.streamName,  parseInt(window.width, 10), parseInt(window.height, 10), parseInt(window.width, 10), parseInt(window.height, 10))
+    } else {
+      updateScaleSize(findNodeHandle(this.red5pro_multistream), this.state.streamName, 120, 120, parseInt(window.width, 10), parseInt(window.height, 10))
+    }
+    this.setState({ toggled: !this.state.toggled })
+  }
 }
 
 const styles = StyleSheet.create({
