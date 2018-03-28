@@ -22,3 +22,4 @@ public interface Stream {
     public R5VideoView getView();
 
 }
+

@@ -3,12 +3,16 @@ package com.red5pro.reactnative.view;
 import android.app.Activity;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.os.Handler;
+import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.facebook.react.bridge.LifecycleEventListener;
+import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.uimanager.ThemedReactContext;
@@ -20,10 +24,17 @@ import com.red5pro.reactnative.stream.SubscriberStream;
 import com.red5pro.streaming.R5Stream;
 import com.red5pro.streaming.R5StreamProtocol;
 import com.red5pro.streaming.config.R5Configuration;
+import com.red5pro.streaming.event.R5ConnectionEvent;
 import com.red5pro.streaming.view.R5VideoView;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 
 public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProxy, LifecycleEventListener {
 
@@ -54,6 +65,8 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
     protected int mClientScreenHeight;
 
     private boolean isInBackground = false;
+//    private boolean isInShutdownMode = true;
+//    private List<String> shutdownTickets;
 
     protected View.OnLayoutChangeListener mLayoutListener;
 
@@ -66,7 +79,8 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
         PUBLISHER_STATUS("onPublisherStreamStatus"),
         SUBSCRIBER_STATUS("onSubscriberStreamStatus"),
         UNPUBLISH_NOTIFICATION("onUnpublishNotification"),
-        UNSUBSCRIBE_NOTIFICATION("onUnsubscribeNotification");
+        UNSUBSCRIBE_NOTIFICATION("onUnsubscribeNotification"),
+        SHUTDOWN_COMPLETE("onShutdownComplete");
 
         private final String mName;
 
@@ -255,15 +269,33 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
 
         Log.d("R5MultiStreamLayout", "shutdown()");
 
-        for(Map.Entry<String, Stream>entry : streamMap.entrySet()) {
-            String key = entry.getKey();
-            Stream stream = (Stream)(entry.getValue());
-//            if (stream.getView() != null) {
-//                removeView(stream.getView());
+//        isInShutdownMode = true;
+
+        try {
+
+//            if (shutdownTickets == null) {
+//                shutdownTickets = new ArrayList<>();
 //            }
-            stream.stop();
+
+//            for (Map.Entry<String, Stream> entry : streamMap.entrySet()) {
+//                String key = entry.getKey();
+//                Stream stream = (Stream) (entry.getValue());
+//                shutdownTickets.add(key);
+//            }
+
+
+            for (Map.Entry<String, Stream> ticket : streamMap.entrySet()) {
+                Stream stream = (Stream) (ticket.getValue());
+                stream.stop();
+            }
+            streamMap.clear();
+
         }
-        streamMap.clear();
+        catch (Exception e) {
+            e.printStackTrace();
+//            isInShutdownMode = false;
+//            shutdownTickets.clear();
+        }
 
     }
 
@@ -311,6 +343,34 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
 
     @Override
     public void dispatchEvent(String streamName, String type, WritableMap map) {
+
+//        try {
+//            if (shutdownTickets != null) {
+//                // TODO: also check map.status.name?
+//                ReadableMapKeySetIterator it = map.keySetIterator();
+//                while (it.hasNextKey()) {
+//                    String key = it.nextKey();
+//                    Log.d("[R5MultiStreamLayout]", key);
+//                    if (key.equals("status")) {
+//                        Log.d("[R5MultiStreamLayout]", "Status: " + map.getMap("status").getString("name"));
+//                    }
+//                }
+//                if (shutdownTickets.contains(streamName) &&
+//                        (map.hasKey("status") && map.getMap("status").getString("name").equals(R5ConnectionEvent.CLOSE.name()))) {
+//                    Log.d("[R5MultiStreamLayout]", "Close event on (" + streamName + ")");
+//                    shutdownTickets.remove(streamName);
+//                }
+//
+//                Log.d("[R5MultiStreamLayout]", "Ticket count? " + shutdownTickets.size());
+//                if (shutdownTickets.size() == 0) {
+//                    WritableMap shutdownMap = new WritableNativeMap();
+//                    mEventEmitter.receiveEvent(this.getId(), R5MultiStreamLayout.Events.SHUTDOWN_COMPLETE.toString(), shutdownMap);
+//                }
+//            }
+//        }
+//        catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
         map.putString("streamName", streamName);
         mEventEmitter.receiveEvent(this.getId(), type, map);
