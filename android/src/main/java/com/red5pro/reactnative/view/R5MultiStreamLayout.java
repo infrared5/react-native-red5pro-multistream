@@ -64,6 +64,7 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
     protected int mClientScreenWidth;
     protected int mClientScreenHeight;
 
+    private boolean mIsCheckingPermissions = false;
     private boolean isInBackground = false;
 //    private boolean isInShutdownMode = true;
 //    private List<String> shutdownTickets;
@@ -105,7 +106,8 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
         UPDATE_SCALE_MODE("updateScaleMode", 6),
         PREVIEW("preview", 7),
         UPDATE_SCALE_SIZE("updateScaleSize", 8),
-        SHUTDOWN("shutdown", 9);
+        SHUTDOWN("shutdown", 9),
+        PERMISSIONS_FLAG("setPermissionsFlag", 10);
 
         private final String mName;
         private final int mValue;
@@ -157,6 +159,11 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
         configuration.setLicenseKey(mLicenseKey);
         configuration.setStreamName(streamName);
         return configuration;
+    }
+
+    public void setIsCheckingPermissions (boolean flag) {
+        Log.d("[R5MultiStreamLayout]", "setting permissions flag to (" + flag + ")");
+        this.mIsCheckingPermissions = flag;
     }
 
     public void subscribe (String streamName, String host, String context, Boolean withVideo, int audioMode) {
@@ -400,8 +407,14 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
     public void onHostPause() {
         Log.d("[R5MultiStreamLayout]", " onPause()");
         isInBackground = true;
+
         if (mLayoutListener != null) {
             this.removeOnLayoutChangeListener(mLayoutListener);
+        }
+
+        Log.d("[R5MultiStreamLayout]", "are we checking permissions?(" + mIsCheckingPermissions + ")");
+        if (mIsCheckingPermissions) {
+            return;
         }
 
         PublisherStream publisher = null;

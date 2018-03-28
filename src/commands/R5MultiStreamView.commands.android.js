@@ -73,3 +73,7 @@ export const updateScaleSize = (handle,
 export const shutdown = (handle) => {
   UIManager.dispatchViewManagerCommand(handle, Commands.shutdown, [])
 }
+
+export const setPermissionsFlag = (handle, flag) => {
+  UIManager.dispatchViewManagerCommand(handle, Commands.setPermissionsFlag, ['unknown:permissions', flag])
+}
