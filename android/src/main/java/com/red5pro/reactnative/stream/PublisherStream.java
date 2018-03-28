@@ -399,7 +399,7 @@ public class PublisherStream implements Stream, R5ConnectionListener {
 
             if (mVideoView != null) {
                 mVideoView.attachStream(null);
-                mVideoView = null;
+                // mVideoView = null;
             }
             // mStream.emptyPublishQueue();
             mStream.stop();
