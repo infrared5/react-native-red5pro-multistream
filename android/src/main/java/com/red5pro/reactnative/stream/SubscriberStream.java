@@ -1,5 +1,7 @@
 package com.red5pro.reactnative.stream;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ViewGroup;
@@ -38,6 +40,10 @@ public class SubscriberStream implements Stream, R5ConnectionListener {
     protected ThemedReactContext mContext;
     protected EventEmitterProxy mEventEmitter;
 
+    protected boolean mIsActive;
+    protected boolean mIsRetry;
+    protected int mRetryCount = 0;
+    protected int mRetryLimit = 3;
 
     public SubscriberStream(ThemedReactContext context, EventEmitterProxy eventEmitterProxy, R5VideoView view) {
 
@@ -92,6 +98,13 @@ public class SubscriberStream implements Stream, R5ConnectionListener {
             mVideoView.attachStream(mStream);
         }
 
+        mStream.audioController = new R5AudioController();
+        mIsActive = true;
+
+    }
+
+    public boolean getIsActive() {
+        return mIsActive;
     }
 
     @Override
@@ -99,7 +112,6 @@ public class SubscriberStream implements Stream, R5ConnectionListener {
 
         Log.d("SubscriberStream", ":start (" + mStreamName + ")");
 
-        mStream.audioController = new R5AudioController();
         mStream.play(mStreamName);
 
     }
@@ -108,6 +120,9 @@ public class SubscriberStream implements Stream, R5ConnectionListener {
     public void stop() {
 
         Log.d("SubscriberStream", ":stop (" + mStreamName + ")");
+
+        mIsActive = false;
+        mIsRetry = false;
 
         if (mStream != null) {
             mStream.client = null;
@@ -201,17 +216,47 @@ public class SubscriberStream implements Stream, R5ConnectionListener {
         statusMap.putString("message", event.message);
         statusMap.putString("name", event.name());
         map.putMap("status", statusMap);
-        mEventEmitter.dispatchEvent(mStreamName, R5MultiStreamLayout.Events.SUBSCRIBER_STATUS.toString(), map);
 
         if (event == R5ConnectionEvent.START_STREAMING) {
             mIsStreaming = true;
+            mEventEmitter.dispatchEvent(mStreamName, R5MultiStreamLayout.Events.SUBSCRIBER_STATUS.toString(), map);
         }
-        else if (event == R5ConnectionEvent.DISCONNECTED && mIsStreaming) {
+        else if (event == R5ConnectionEvent.ERROR && event.message.equals("No Valid Media Found")) {
+            if (mRetryCount++ < mRetryLimit) {
+                mIsRetry = true;
+                Log.d("SubscriberStream", "trying to subscriber again for(" + this.mStreamName + ")");
+                final SubscriberStream stream = this;
+                Handler h = new Handler(Looper.getMainLooper());
+                h.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (stream.getIsActive()) {
+                            stream.resume();
+                        }
+                    }
+                }, 2000);
+                return;
+            }
+            else {
+                Log.d("SubscriberStream", "done with attempts for(" + this.mStreamName + ")");
+                mIsRetry = false;
+                mEventEmitter.dispatchEvent(mStreamName, R5MultiStreamLayout.Events.SUBSCRIBER_STATUS.toString(), map);
+            }
+        }
+        else if (event == R5ConnectionEvent.DISCONNECTED && mIsStreaming && !mIsRetry) {
+            mEventEmitter.dispatchEvent(mStreamName, R5MultiStreamLayout.Events.SUBSCRIBER_STATUS.toString(), map);
+
             WritableMap evt = new WritableNativeMap();
             mEventEmitter.dispatchEvent(mStreamName, R5MultiStreamLayout.Events.UNSUBSCRIBE_NOTIFICATION.toString(), evt);
             Log.d("SubscriberStream", "DISCONNECT");
 //            cleanup();
             mIsStreaming = false;
+        }
+        else if (event == R5ConnectionEvent.CLOSE && mIsRetry) {
+            // swallow
+        }
+        else {
+            mEventEmitter.dispatchEvent(mStreamName, R5MultiStreamLayout.Events.SUBSCRIBER_STATUS.toString(), map);
         }
 
     }

@@ -128,6 +128,7 @@ public class PublisherStream implements Stream, R5ConnectionListener {
             mic.setBitRate(32);
             // e.g., ->
             // This is required to be 8000 in order for 2-Way to work.
+            mStream.audioController = new R5AudioController();
             mStream.audioController.sampleRate = 8000;
             mMicrophone = mic;
 
@@ -399,7 +400,7 @@ public class PublisherStream implements Stream, R5ConnectionListener {
 
             if (mVideoView != null) {
                 mVideoView.attachStream(null);
-                // mVideoView = null;
+//                mVideoView = null;
             }
             // mStream.emptyPublishQueue();
             mStream.stop();
@@ -504,4 +505,5 @@ public class PublisherStream implements Stream, R5ConnectionListener {
     }
 
 }
+
 
