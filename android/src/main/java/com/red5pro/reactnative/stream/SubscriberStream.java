@@ -66,9 +66,11 @@ public class SubscriberStream implements Stream, R5ConnectionListener {
 
     public void onMetaData(String metadata) {
 
-        WritableMap map = new WritableNativeMap();
-        map.putString("metadata", metadata);
-        mEventEmitter.dispatchEvent(mStreamName, R5MultiStreamLayout.Events.METADATA.toString(), map);
+        if (mEventEmitter != null) {
+            WritableMap map = new WritableNativeMap();
+            map.putString("metadata", metadata);
+            mEventEmitter.dispatchEvent(mStreamName, R5MultiStreamLayout.Events.METADATA.toString(), map);
+        }
 
     }
 
