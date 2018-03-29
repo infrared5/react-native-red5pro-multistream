@@ -190,10 +190,16 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
             if (stream instanceof SubscriberStream) {
                 stream.stop();
             }
+            else {
+                Log.d("[R5MultiStreamLayout]", "Could not unsubscribe from(" + streamName + "). Not a subscription stream.");
+            }
             if (stream.getView() != null) {
                 removeView(stream.getView());
             }
             streamMap.remove(streamName);
+        }
+        else {
+            Log.d("[R5MultiStreamLayout]", "Could not unsubscribe from(" + streamName + "). Not found in map.");
         }
 
     }
@@ -521,5 +527,4 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
      */
 
 }
-
 
