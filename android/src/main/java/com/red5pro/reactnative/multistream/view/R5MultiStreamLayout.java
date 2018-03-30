@@ -1,4 +1,4 @@
-package com.red5pro.reactnative.view;
+package com.red5pro.reactnative.multistream.view;
 
 import android.app.Activity;
 import android.content.res.Configuration;
@@ -18,9 +18,9 @@ import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 
-import com.red5pro.reactnative.stream.PublisherStream;
-import com.red5pro.reactnative.stream.Stream;
-import com.red5pro.reactnative.stream.SubscriberStream;
+import com.red5pro.reactnative.multistream.stream.PublisherStream;
+import com.red5pro.reactnative.multistream.stream.Stream;
+import com.red5pro.reactnative.multistream.stream.SubscriberStream;
 import com.red5pro.streaming.R5Stream;
 import com.red5pro.streaming.R5StreamProtocol;
 import com.red5pro.streaming.config.R5Configuration;

@@ -1,4 +1,4 @@
-package com.red5provideoviewexample;
+package com.red5promultistreamexample;
 
 import android.app.Application;
 
@@ -8,7 +8,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 
-import com.red5pro.reactnative.R5MultiStreamPackage;
+import com.red5pro.reactnative.multistream.R5MultiStreamPackage;
 
 import java.util.Arrays;
 import java.util.List;

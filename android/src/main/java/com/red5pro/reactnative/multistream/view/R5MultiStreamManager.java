@@ -1,4 +1,4 @@
-package com.red5pro.reactnative.view;
+package com.red5pro.reactnative.multistream.view;
 
 import android.util.Log;
 

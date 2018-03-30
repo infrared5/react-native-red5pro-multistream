@@ -21,8 +21,8 @@ import {
   updateScaleSize
 } from 'react-native-red5pro-multistream'
 
-const host = 'ADD YOUR HOST'
-const licenseKey = 'ADD YOUR PROD KEY'
+const host = '18.218.79.30'
+const licenseKey = 'BWAP-WF5E-JZU2-6I5G'
 const bundleID = 'com.red5pro.multistream'
 
 const streamlistURL = 'https://nafarat.red5.org/streammanager/api/2.0/event/list'
@@ -120,8 +120,8 @@ export default class App extends React.Component {
     if (currentLength < nextSubs.length) {
       const newSubs = currentLength > 0 ? nextSubs.slice(currentLength - 1) : nextSubs
       newSubs.map((sub, index) => {
-        const withVideo = sub.name.match(/r5pro-video/)
-        const withAudio = sub.name.match(/r5pro-audio/)
+        const withVideo = sub.name.match(/r5pro2-video/)
+        const withAudio = sub.name.match(/r5pro2-audio/)
         if (!withVideo && !withAudio) {
           return false
         }
@@ -192,8 +192,8 @@ export default class App extends React.Component {
     const mystream = this.state.streamName
     const currentStreamList = this.state.subscriberList
     const availableSubscribers = json.filter((stream, index) => {
-      const withVideo = stream.name.match(/r5pro-video/)
-      const withAudio = stream.name.match(/r5pro-audio/)
+      const withVideo = stream.name.match(/r5pro2-video/)
+      const withAudio = stream.name.match(/r5pro2-audio/)
       let i = currentStreamList.length
       while (--i > -1) {
         if (currentStreamList[i].name === stream.name) {
@@ -289,7 +289,7 @@ export default class App extends React.Component {
     let message = isValidStatusMessage(status.message) ? status.message : status.name
     if (status.name === 'ERROR') {
       this.bannedList.push(streamName)
-      Alert('Stream Error', `${streamName}: ${message}`)
+      Alert.alert('Stream Error', `${streamName}: ${message}`)
     }
       /*
     if (!this.state.inErrorState) {
@@ -317,7 +317,7 @@ export default class App extends React.Component {
     }
     else if (status.name === 'ERROR') {
       this.bannedList.push(streamName)
-      Alert('Stream Error', `${streamName}: ${message}`)
+      Alert.alert('Stream Error', `${streamName}: ${message}`)
     }
       /*
     if (!this.state.inErrorState) {
@@ -354,7 +354,7 @@ export default class App extends React.Component {
   onPublish () {
     const randomId = Math.floor(Math.random() * 0x10000).toString(16)
     this.setState({
-      streamName: 'r5pro-videoStream-' + randomId,
+      streamName: 'r5pro2-videoStream-' + randomId,
       publisherSelection: PubType.VIDEO
     })
   }
@@ -362,7 +362,7 @@ export default class App extends React.Component {
   onPublishAudio () {
     const randomId = Math.floor(Math.random() * 0x10000).toString(16)
     this.setState({
-      streamName: 'r5pro-audioStream-' + randomId,
+      streamName: 'r5pro2-audioStream-' + randomId,
       publisherSelection: PubType.AUDIO
     })
   }

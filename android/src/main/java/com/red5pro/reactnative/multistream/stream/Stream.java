@@ -1,4 +1,4 @@
-package com.red5pro.reactnative.stream;
+package com.red5pro.reactnative.multistream.stream;
 
 import com.red5pro.streaming.config.R5Configuration;
 import com.red5pro.streaming.view.R5VideoView;
