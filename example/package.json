@@ -10,7 +10,8 @@
   "scripts": {
     "start": "react-native start",
     "android": "react-native run-android",
-    "android:prod": "react-native run-android --variant=release",
+    "preandroid:prod": "react-native bundle --dev false --platform android --entry-file index.android.js --bundle-output ./android/app/build/intermediates/assets/debug/index.android.bundle --assets-dest ./android/app/build/intermediates/res/merged/debug",
+    "android:prod": "cd android && ./gradlew assembleRelease",
     "ios": "react-native run-ios",
     "test": "node node_modules/jest/bin/jest.js"
   },
