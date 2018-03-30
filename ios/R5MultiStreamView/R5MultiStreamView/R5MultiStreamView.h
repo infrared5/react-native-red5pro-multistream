@@ -15,7 +15,9 @@
 #import <React/RCTBridgeModule.h>
 #import <R5Streaming/R5Streaming.h>
 
-@interface R5MultiStreamView : RCTView<R5StreamDelegate>
+@protocol Stream;
+
+@interface R5MultiStreamView : RCTView
 
 @property R5Stream *stream;
 @property R5Connection *connection;
@@ -74,4 +76,18 @@ andCameraHeight:(int)height
 
 @end
 
-#endif /* R5VideoView_h */
+@protocol Stream <NSObject>
+
+- (void)start;
+- (void)stop;
+- (void)pause;
+- (void)resume;
+- (void)updateScaleSize:(int)width withHeight:(int)height andScreenWidth:(int)screenWidth andScreenHeight:(int)screenHeight;
+- (int)getLogLevel;
+- (void)setLogLevel:(int)value;
+- (R5VideoViewController *)getView;
+
+@end
+
+
+#endif /* R5MultiStreamView_h */

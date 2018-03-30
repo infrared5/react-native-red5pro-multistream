@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		486EE196206ED3C500DFC4BF /* R5PublisherStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 486EE195206ED3C500DFC4BF /* R5PublisherStream.m */; };
 		4885C7B01FBDFA7400E77415 /* R5MultiStreamView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4885C7AF1FBDFA7400E77415 /* R5MultiStreamView.m */; };
 		4885C7B11FBDFA7400E77415 /* R5MultiStreamView.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4885C7AE1FBDFA7400E77415 /* R5MultiStreamView.h */; };
 		4885C7B91FBDFABD00E77415 /* R5MultiStreamViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4885C7B71FBDFABD00E77415 /* R5MultiStreamViewManager.m */; };
@@ -26,6 +27,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		486EE195206ED3C500DFC4BF /* R5PublisherStream.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = R5PublisherStream.m; sourceTree = "<group>"; };
 		4885C7AB1FBDFA7400E77415 /* libR5MultStreamView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libR5MultStreamView.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		4885C7AE1FBDFA7400E77415 /* R5MultiStreamView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = R5MultiStreamView.h; sourceTree = "<group>"; };
 		4885C7AF1FBDFA7400E77415 /* R5MultiStreamView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = R5MultiStreamView.m; sourceTree = "<group>"; };
@@ -67,6 +69,7 @@
 				4885C7B71FBDFABD00E77415 /* R5MultiStreamViewManager.m */,
 				4885C7AE1FBDFA7400E77415 /* R5MultiStreamView.h */,
 				4885C7AF1FBDFA7400E77415 /* R5MultiStreamView.m */,
+				486EE195206ED3C500DFC4BF /* R5PublisherStream.m */,
 			);
 			path = R5MultiStreamView;
 			sourceTree = "<group>";
@@ -129,6 +132,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4885C7B01FBDFA7400E77415 /* R5MultiStreamView.m in Sources */,
+				486EE196206ED3C500DFC4BF /* R5PublisherStream.m in Sources */,
 				4885C7B91FBDFABD00E77415 /* R5MultiStreamViewManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
