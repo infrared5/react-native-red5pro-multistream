@@ -1,4 +1,4 @@
-package com.red5pro.reactnative.util;
+package com.red5pro.reactnative.multistream.util;
 
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;

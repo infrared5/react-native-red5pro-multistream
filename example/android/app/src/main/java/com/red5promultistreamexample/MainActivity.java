@@ -1,4 +1,4 @@
-package com.red5provideoviewexample;
+package com.red5promultistreamexample;
 
 import com.facebook.react.ReactActivity;
 

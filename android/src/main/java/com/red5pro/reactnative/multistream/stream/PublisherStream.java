@@ -1,4 +1,4 @@
-package com.red5pro.reactnative.stream;
+package com.red5pro.reactnative.multistream.stream;
 
 import android.hardware.Camera;
 import android.util.DisplayMetrics;
@@ -11,8 +11,8 @@ import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.uimanager.ThemedReactContext;
-import com.red5pro.reactnative.view.EventEmitterProxy;
-import com.red5pro.reactnative.view.R5MultiStreamLayout;
+import com.red5pro.reactnative.multistream.view.EventEmitterProxy;
+import com.red5pro.reactnative.multistream.view.R5MultiStreamLayout;
 import com.red5pro.streaming.R5Connection;
 import com.red5pro.streaming.R5Stream;
 import com.red5pro.streaming.config.R5Configuration;
@@ -506,4 +506,3 @@ public class PublisherStream implements Stream, R5ConnectionListener {
     }
 
 }
-
