@@ -89,6 +89,8 @@ public class SubscriberStream implements Stream, R5ConnectionListener {
 
         Log.d("SubscriberStream", ":init (" + mStreamName + ")");
 
+        Log.d("SubscriberStream", ":host(" + mStream.connection.getConfiguration().getHost() + ")");
+
         mStream.setListener(this);
         mStream.client = this;
 
@@ -127,6 +129,8 @@ public class SubscriberStream implements Stream, R5ConnectionListener {
         if (mStream != null) {
             mStream.client = null;
             mStream.stop();
+            mStream.setListener(null);
+            mStream = null;
         }
         else {
             WritableMap map = Arguments.createMap();
@@ -144,6 +148,7 @@ public class SubscriberStream implements Stream, R5ConnectionListener {
 
     @Override
     public void pause () {
+        Log.d("SubscriberStream", ":pause (" + mStreamName + ")");
         // Removing the listener will allow us to stop but not send close events down, which cause unsubscribe.
         if (mStream != null) {
             mStream.removeListener();
@@ -153,6 +158,7 @@ public class SubscriberStream implements Stream, R5ConnectionListener {
 
     @Override
     public void resume () {
+        Log.d("SubscriberStream", ":resume (" + mStreamName + ")");
         this.init(mConfiguration);
         this.start();
     }
@@ -253,7 +259,12 @@ public class SubscriberStream implements Stream, R5ConnectionListener {
             mIsStreaming = false;
         }
         else if (event == R5ConnectionEvent.CLOSE && mIsRetry) {
-            // swallow
+            // swallow. We are going to retry mRetryLimit...
+            // else this will flow to the last clause and invoke a CLOSE on the JS client.
+        }
+        else if (event == R5ConnectionEvent.NET_STATUS && event.message.equals("NetStream.Play.StreamDry")) {
+            Log.d("SubscriberStream", "Subscriber has run dry(" + this.mStreamName + ")");
+            this.stop();
         }
         else {
             mEventEmitter.dispatchEvent(mStreamName, R5MultiStreamLayout.Events.SUBSCRIBER_STATUS.toString(), map);

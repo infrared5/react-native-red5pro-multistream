@@ -65,7 +65,8 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
     protected int mClientScreenHeight;
 
     private boolean mIsCheckingPermissions = false;
-    private boolean isInBackground = false;
+    private boolean mIsResumable = false;
+    private boolean mIsInBackground = false;
 //    private boolean isInShutdownMode = true;
 //    private List<String> shutdownTickets;
 
@@ -174,7 +175,7 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
         subscriber.init(createConfiguration(streamName, host, context));
         streamMap.put(streamName, subscriber);
 
-        if (!isInBackground) {
+        if (!mIsInBackground) {
             subscriber.start();
         }
         onConfigured(streamName, streamName + this.getId());
@@ -393,12 +394,16 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
     @Override
     public void onHostResume() {
         Log.d("[R5MultiStreamLayout]", "onResume()");
-        isInBackground = false;
+        mIsInBackground = false;
         Activity activity = mContext.getCurrentActivity();
         if (mLayoutListener == null) {
             mLayoutListener = setUpOrientationListener();
         }
         this.addOnLayoutChangeListener(mLayoutListener);
+
+        if (!mIsResumable) {
+            return;
+        }
 
         for(Map.Entry<String, Stream>entry : streamMap.entrySet()) {
             String key = entry.getKey();
@@ -407,12 +412,13 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
                 ((SubscriberStream) stream).resume();
             }
         }
+        mIsResumable = false;
     }
 
     @Override
     public void onHostPause() {
         Log.d("[R5MultiStreamLayout]", " onPause()");
-        isInBackground = true;
+        mIsInBackground = true;
 
         if (mLayoutListener != null) {
             this.removeOnLayoutChangeListener(mLayoutListener);
@@ -422,6 +428,8 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
         if (mIsCheckingPermissions) {
             return;
         }
+
+        mIsResumable = true;
 
         PublisherStream publisher = null;
         for(Map.Entry<String, Stream>entry : streamMap.entrySet()) {
@@ -446,6 +454,9 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
     @Override
     public void onHostDestroy() {
         Log.d("[R5MultiStreamLayout]", "onDestroy()");
+        mIsCheckingPermissions = false;
+        mIsInBackground = false;
+        mIsResumable = false;
     }
 
     @Override
