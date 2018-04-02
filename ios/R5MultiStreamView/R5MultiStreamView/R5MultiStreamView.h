@@ -16,8 +16,32 @@
 #import <R5Streaming/R5Streaming.h>
 
 @protocol Stream;
+@protocol EventEmitterProxy;
 
-@interface R5MultiStreamView : RCTView
+@protocol Stream <NSObject>
+
+- (void)start;
+- (void)stop;
+- (void)pause;
+- (void)resume;
+- (void)updateScaleSize:(int)width withHeight:(int)height andScreenWidth:(int)screenWidth andScreenHeight:(int)screenHeight;
+- (int)getLogLevel;
+- (void)setLogLevel:(int)value;
+- (R5VideoViewController *)getView;
+
+@end
+
+@protocol EventEmitterProxy <NSObject>
+
+- (void)onStreamMetaDataEvent:(NSString *)streamName andMessage:(NSDictionary *)message;
+- (void)onStreamPublisherStatus:(NSString *)streamName andMessage:(NSDictionary *)message;
+- (void)onStreamSubscriberStatus:(NSString *)streamName andMessage:(NSDictionary *)message;
+- (void)onStreamUnpublishNotification:(NSString *)streamName andMessage:(NSDictionary *)message;
+- (void)onStreamUnsubscribeNotification:(NSString *)streamName andMessage:(NSDictionary *)message;
+
+@end
+
+@interface R5MultiStreamView : RCTView <EventEmitterProxy>
 
 @property R5Stream *stream;
 @property R5Connection *connection;
@@ -47,6 +71,7 @@
  andCameraWidth:(int)with
 andCameraHeight:(int)height
         andMode:(int)publishMode;
+
 - (void)unsubscribe:(NSString *)streamName;
 
 - (void)unpublish:(NSString *)streamName;
@@ -75,19 +100,5 @@ andCameraHeight:(int)height
 @property (setter=setLogLevel:, getter=getLogLevel) int logLevel;
 
 @end
-
-@protocol Stream <NSObject>
-
-- (void)start;
-- (void)stop;
-- (void)pause;
-- (void)resume;
-- (void)updateScaleSize:(int)width withHeight:(int)height andScreenWidth:(int)screenWidth andScreenHeight:(int)screenHeight;
-- (int)getLogLevel;
-- (void)setLogLevel:(int)value;
-- (R5VideoViewController *)getView;
-
-@end
-
 
 #endif /* R5MultiStreamView_h */

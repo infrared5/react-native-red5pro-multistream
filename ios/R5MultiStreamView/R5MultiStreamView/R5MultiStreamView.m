@@ -6,7 +6,9 @@
 //  Copyright © 2017 Infrared5, Inc. All rights reserved.
 //
 
+#import <objc/runtime.h>
 #import "R5MultiStreamView.h"
+#import "R5PublisherStream.h"
 
 @interface R5MultiStreamView() {
   
@@ -24,6 +26,8 @@
     BOOL _isStreaming;
     int _currentRotation;
     
+    NSMutableDictionary *_streamMap;
+    
 }
 @end
 
@@ -31,19 +35,21 @@
 
 - (id)init {
   
-  if (self = [super init]) {
+    if (self = [super init]) {
     
-    _logLevel = 3;
-    _showDebugInfo = NO;
-    _bitrate = 750;
-    _framerate = 15;
-    _bufferTime = 0.5;
-    _streamBufferTime = 2.0;
-    _useAdaptiveBitrateController = NO;
+      _logLevel = 3;
+      _showDebugInfo = NO;
+      _bitrate = 750;
+      _framerate = 15;
+      _bufferTime = 0.5;
+      _streamBufferTime = 2.0;
+      _useAdaptiveBitrateController = NO;
+      
+      _streamMap = [[NSMutableDictionary alloc] initWithCapacity:4];
     
-  }
-  return self;
-  
+    }
+    return self;
+    
 }
 
 - (R5VideoViewController *)createVideoView {
@@ -52,52 +58,31 @@
     return ctrl;
 }
 
-- (R5Configuration *)creatConfiguration:(NSString *)streamName
+- (R5Configuration *)createConfiguration:(NSString *)streamName
                                withHost:(NSString *)host
                              andContext:(NSString *)context {
-    R5Configuration configuration = [[R5Configuration alloc] init];
+    
+    R5Configuration *configuration = [[R5Configuration alloc] init];
     configuration.protocol = 1;
     configuration.host = host;
     configuration.port = 8554;
-    configuruation.contextName = context;
+    configuration.contextName = context;
     configuration.streamName = streamName;
     configuration.licenseKey = _licenseKey;
     configuration.bundleID = _bundleID;
     configuration.buffer_time = _bufferTime;
     configuration.stream_buffer_time = _streamBufferTime;
     return configuration;
-}
-
-- (AVCaptureDevice *)getCameraDevice:(BOOL)backfacing {
-  
-  NSArray *list = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
-  AVCaptureDevice *frontCamera;
-  AVCaptureDevice *backCamera;
-  for (AVCaptureDevice *device in list) {
-    if (device.position == AVCaptureDevicePositionFront) {
-      frontCamera = device;
-    }
-    else if (device.position == AVCaptureDevicePositionBack) {
-      backCamera = device;
-    }
-  }
-  
-  if (backfacing && backCamera != NULL) {
-    return backCamera;
-  }
-  return frontCamera;
-  
+    
 }
 
 - (void)subscribe:(NSString *)streamName
          withHost:(NSString *)host
        andContext:(NSString *)context
      andWithVideo:(BOOL)withVideo
-     andAudioMode:(int)audioMode; {
+     andAudioMode:(int)audioMode {
   
-  _isPublisher = NO;
-  _streamName = streamName;
- 
+    /*
   if (_playbackVideo) {
     [self.controller setScaleMode:_scaleMode];
   }
@@ -105,96 +90,83 @@
   [self.stream setAudioController:[[R5AudioController alloc] initWithMode:_audioMode]];
   
   [self.stream play:streamName];
+     */
   
 }
 
-- (void)unsubscribe {
+- (void)unsubscribe:(NSString *) streamName {
   
-  dispatch_async(dispatch_get_main_queue(), ^{
-    if (_isStreaming) {
-      [self.stream stop];
+    /*
+    R5SubsriberStream *stream = (R5SubsriberStream *)[_streamMap objectForKey:streamName];
+    if (stream != NULL) {
+        [stream stop];
+    }
+     */
+  
+}
+
+- (void)publish:(NSString *)streamName
+       withHost:(NSString *)host
+     andContext:(NSString *)context
+   andWithVideo:(BOOL)withVideo
+ andCameraWidth:(int)width
+andCameraHeight:(int)height
+        andMode:(int)publishMode {
+  
+    R5PublisherStream *publisher = NULL;
+    
+    if (withVideo) {
+        publisher = [[R5PublisherStream alloc] initWithEventProxy:self andView:[self createVideoView]];
     }
     else {
-      self.onUnpublishNotification(@{});
-      [self tearDown];
+        publisher = [[R5PublisherStream alloc] initWithEventProxy:self];
     }
-  });
-  
-}
-
-/*
-- (void)preview {
     
-    if (_useVideo) {
-        AVCaptureDevice *video = [self getCameraDevice:_useBackfacingCamera];
-        R5Camera *camera = [[R5Camera alloc] initWithDevice:video andBitRate:_bitrate];
-        [camera setWidth:_cameraWidth];
-        [camera setHeight:_cameraHeight];
-        [camera setOrientation:90];
-        [camera setFps:_framerate];
-        [self.stream attachVideo:camera];
-    }
-    if (_useAudio) {
-        AVCaptureDevice *audio = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeAudio];
-        R5Microphone *microphone = [[R5Microphone alloc] initWithDevice:audio];
-        microphone.bitrate = _audioBitrate;
-        microphone.sampleRate = _audioSampleRate;
-        [self.stream attachAudio:microphone];
-    }
-
-}
-*/
-
-- (void)publish:(NSString *)streamName withMode:(int)publishMode {
-  
-  _isPublisher = YES;
-  _streamName = streamName;
-  
-  if (_useAdaptiveBitrateController) {
-    R5AdaptiveBitrateController *abrController = [[R5AdaptiveBitrateController alloc] init];
-    [abrController attachToStream:self.stream];
-    [abrController setRequiresVideo:_useVideo];
-  }
-  
-  [self onDeviceOrientation:NULL];
-  [self.stream publish:streamName type:publishMode];
-  [self.stream updateStreamMeta];
-  
-}
-
-- (void)unpublish {
-
-  dispatch_async(dispatch_get_main_queue(), ^{
-    if (_isStreaming) {
-      [self.stream stop];
-    }
-    else {
-      self.onUnpublishNotification(@{});
-      [self tearDown];
-    }
-  });
-  
-}
-
-- (void)swapCamera {
-  
-  if (_isPublisher) {
-    _useBackfacingCamera = !_useBackfacingCamera;
-    AVCaptureDevice *device = [self getCameraDevice:_useBackfacingCamera];
-    R5Camera *camera = (R5Camera *)[self.stream getVideoSource];
-    [camera setDevice:device];
-  }
-  
-}
-
-- (void)updateScaleMode:(int)mode {
+    [publisher setConfiguration:[self createConfiguration:streamName withHost:host andContext:context]
+                 andCameraWidth:width
+                andCameraHeight:height
+                     andBitrate:_bitrate
+                   andFramerate:_framerate
+                  andStreamType:publishMode
+                      andUseABR:_useAdaptiveBitrateController];
     
-    [self setScaleMode:mode];
+    [_streamMap setObject:publisher forKey:streamName];
     
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.onConfigured) {
+            self.onConfigured(@{@"key": streamName});
+        }
+    });
+    
+    [self onDeviceOrientation:NULL];
+  
 }
 
-- (void)updateScaleSize:(int)width withHeight:(int)height withScreenWidth:(int)screenWidth withScreenHeight:(int)screenHeight {
+- (void)unpublish:(NSString *)streamName {
+
+    R5PublisherStream *stream = (R5PublisherStream *)[_streamMap objectForKey:streamName];
+    if (stream != NULL) {
+        [stream stop];
+    }
+  
+}
+
+- (void)updateScaleSize:(NSString *)streamName
+              withWidth:(int)width
+             withHeight:(int)height
+        withScreenWidth:(int)screenWidth
+       withScreenHeight:(int)screenHeight {
     
+    for (id key in _streamMap) {
+        id<Stream> stream = (id<Stream>)[_streamMap objectForKey:key];
+        R5VideoViewController *controller = [stream getView];
+        if (controller != NULL) {
+            CGRect b = self.frame;
+            [controller setFrame:CGRectMake(0.0, 0.0, b.size.width, b.size.height)];
+        }
+    }
+    
+    /*
     if (_playbackVideo) {
         float xscale = (width*1.0f) / (screenWidth*1.0f);
         float yscale = (height*1.0f) / (screenHeight*1.0f);
@@ -205,19 +177,17 @@
         NSLog(@"R5VideoView:: scale(%f, %f), screen(%d, %d)", xscale, yscale, dwidth, dheight);
         [self.controller setFrame:CGRectMake(0.0, 0.0, dwidth * xscale, dheight * yscale)];
     }
+     */
     
 }
 
-- (void)tearDown {
-  
-  if (self.stream != nil) {
-    [self.stream setDelegate:nil];
-    [self.stream setClient:nil];
-  }
-  
-  _streamName = nil;
-  _isStreaming = NO;
-
+- (void)swapCamera:(NSString *)streamName {
+    
+    R5PublisherStream *stream = (R5PublisherStream *)[_streamMap objectForKey:streamName];
+    if (stream != NULL) {
+        [stream swapCamera];
+    }
+    
 }
 
 - (void)updateOrientation:(int)value {
@@ -230,120 +200,70 @@
   
 }
 
+
+- (void)tearDown {
+    
+    if (self.stream != nil) {
+        [self.stream setDelegate:nil];
+        [self.stream setClient:nil];
+    }
+    
+    _isStreaming = NO;
+    
+}
+
+- (void)shutdown {
+    
+}
+
+#pragma NSNotificationDelegate
 - (void)onDeviceOrientation:(NSNotification *)notification {
   
-  if (_isPublisher) {
-    R5Camera *camera = (R5Camera *)[self.stream getVideoSource];
-    UIDeviceOrientation orientation = [UIDevice currentDevice].orientation;
-  
-    if (orientation == UIDeviceOrientationPortraitUpsideDown) {
-      [camera setOrientation: 270];
+    for (id key in _streamMap) {
+        id<Stream> stream = (id<Stream>)[_streamMap objectForKey:key];
+        R5PublisherStream *publisher = (R5PublisherStream *)stream;
+        if (publisher != NULL) {
+            [publisher setDeviceOrientation:[UIDevice currentDevice].orientation];
+        }
     }
-    else if (orientation == UIDeviceOrientationLandscapeLeft) {
-      if (_useBackfacingCamera) {
-        [camera setOrientation: 0];
-      }
-      else {
-        [camera setOrientation: 180];
-      }
-    }
-    else if (orientation == UIDeviceOrientationLandscapeRight) {
-      if (_useBackfacingCamera) {
-        [camera setOrientation: 180];
-      }
-      else {
-        [camera setOrientation: 0];
-      }
-    }
-    else {
-      [camera setOrientation: 90];
-    }
-    [self.controller showPreview:YES];
-    [self.stream updateStreamMeta];
-    
-  }
 
 }
 
 - (void)layoutSubviews {
   
-  [super layoutSubviews];
-    // TODO: Travers stream map and set frame if view found
-    /*
-  if (_playbackVideo) {
-    CGRect b = self.frame;
-    [self.controller setFrame:CGRectMake(0.0, 0.0, b.size.width, b.size.height)];
-  }
-     */
+    [super layoutSubviews];
+    for (id key in _streamMap) {
+        id<Stream> stream = (id<Stream>)[_streamMap objectForKey:key];
+        R5VideoViewController *controller = [stream getView];
+        if (controller != NULL) {
+            CGRect b = self.frame;
+            [controller setFrame:CGRectMake(0.0, 0.0, b.size.width, b.size.height)];
+        }
+    }
   
 }
 
-# pragma R5StreamDelegate
--(void)onR5StreamStatus:(R5Stream *)stream withStatus:(int) statusCode withMessage:(NSString*)msg {
-  
-  NSString *tmpStreamName = _streamName;
-  
-  if (statusCode == r5_status_start_streaming) {
-    _isStreaming = YES;
-  }
-  
-  dispatch_async(dispatch_get_main_queue(), ^{
-    
-    if (_isPublisher) {
-      self.onPublisherStreamStatus(@{
-                                     @"status": @{
-                                         @"code": @(statusCode),
-                                         @"message": msg,
-                                         @"name": @(r5_string_for_status(statusCode)),
-                                         @"streamName": tmpStreamName
-                                         }
-                                     });
-    }
-    else {
-      self.onSubscriberStreamStatus(@{
-                                      @"status": @{
-                                          @"code": @(statusCode),
-                                          @"message": msg,
-                                          @"name": @(r5_string_for_status(statusCode)),
-                                          @"streamName": tmpStreamName
-                                          }
-                                      });
-    }
-    
-    if (statusCode == r5_status_disconnected && _isStreaming) {
-      if (!_isPublisher) {
-        self.onUnsubscribeNotification(@{});
-      }
-      else if (_isPublisher) {
-        self.onUnpublishNotification(@{});
-      }
-      [self tearDown];
-      _isStreaming = NO;
-    }
-    
-  });
-  
+# pragma EventEmitterProxy
+- (void)onStreamMetaDataEvent:(NSString *)streamName andMessage:(NSDictionary *)message {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.onMetaDataEvent(message);
+    });
 }
-
-# pragma R5Stream:client
-- (void)onMetaData:(NSString *)params {
-  
-  NSArray *paramListing = [params componentsSeparatedByString:@";"];
-  for (id param in paramListing) {
-    NSArray *keyValue = [(NSString *)param componentsSeparatedByString:@"="];
-    NSString *key = (NSString *)[keyValue objectAtIndex:0];
-    if ([key  isEqual: @"streamingMode"]) {
-      NSString *streamMode = (NSString *)[keyValue objectAtIndex:1];
-    }
-    else if ([key isEqual: @"orientation"]) {
-      [self updateOrientation:[[keyValue objectAtIndex:1] intValue]];
-    }
-  }
-  
-  dispatch_async(dispatch_get_main_queue(), ^{
-    self.onMetaDataEvent(@{@"metadata": params});
-  });
-  
+- (void)onStreamPublisherStatus:(NSString *)streamName andMessage:(NSDictionary *)message {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.onPublisherStreamStatus(message);
+    });
+}
+- (void)onStreamSubscriberStatus:(NSString *)streamName andMessage:(NSDictionary *)message {
+    
+}
+- (void)onStreamUnpublishNotification:(NSString *)streamName andMessage:(NSDictionary *)message {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.onUnpublishNotification(message);
+    });
+}
+- (void)onStreamUnsubscribeNotification:(NSString *)streamName andMessage:(NSDictionary *)message {
+    
 }
 
 - (BOOL)getShowDebugInfo {
