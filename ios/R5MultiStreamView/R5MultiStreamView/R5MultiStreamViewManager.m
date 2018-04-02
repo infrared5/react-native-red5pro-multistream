@@ -31,19 +31,32 @@ RCT_EXPORT_VIEW_PROPERTY(onUnsubscribeNotification, RCTBubblingEventBlock)
 
 
 # pragma RN Methods
-RCT_EXPORT_METHOD(subscribe:(nonnull NSString *)streamName withHost:(NSString *)host andContext:(NSString*)context andWithVideo:(BOOL)withVideo andAudioMode:(int):audioMode) {
+RCT_EXPORT_METHOD(subscribe:(nonnull NSString *)streamName
+                  withHost:(NSString *)host
+                  andContext:(NSString*)context
+                  andWithVideo:(BOOL)withVideo
+                  andAudioMode:(int)audioMode) {
+
     [r5View subscribe:streamName
              withHost:host
            andContext:context
          andWithVideo:withVideo
          andAudioMode:audioMode];
+
 }
 
 RCT_EXPORT_METHOD(unsubscribe:(nonnull NSString*)streamName) {
     [r5View unsubscribe:streamName];
 }
 
-RCT_EXPORT_METHOD(publish:(nonnull NSString *)streamName withHost:(NSString *)host andContext:(NSString*)context andWithVideo:(BOOL)withVideo andCameraWidth:(int)width andCameraHeight:(int)height andMode:(int)publishMode) {
+RCT_EXPORT_METHOD(publish:(nonnull NSString *)streamName
+                  withHost:(NSString *)host
+                  andContext:(NSString*)context
+                  andWithVideo:(BOOL)withVideo
+                  andCameraWidth:(int)width
+                  andCameraHeight:(int)height
+                  andMode:(int)publishMode) {
+
     [r5View publish:streamName
            withHost:host
          andContext:context
@@ -51,6 +64,7 @@ RCT_EXPORT_METHOD(publish:(nonnull NSString *)streamName withHost:(NSString *)ho
      andCameraWidth:width
     andCameraHeight:height
             andMode:publishMode];
+
 }
 
 RCT_EXPORT_METHOD(unpublish:(nonnull NSString *)streamName) {
@@ -61,16 +75,22 @@ RCT_EXPORT_METHOD(swapCamera:(nonnull NSString *)streamName) {
     [r5View swapCamera:streamName];
 }
 
-RCT_EXPORT_METHOD(updateScaleMode::(nonnull NSString *)streamName withMode(int)mode) {
+RCT_EXPORT_METHOD(updateScaleMode:(nonnull NSString *)streamName withMode:(int)mode) {
     [r5View updateScaleMode:streamName withMode:mode];
 }
 
-RCT_EXPORT_METHOD(updateScaleSize::(nonnull NSString *)streamName withWidth(int)width andHeight:(int)height andScreenWidth:(int)screenWidth andScreenHeight:(int)screenHeight) {
+RCT_EXPORT_METHOD(updateScaleSize:(nonnull NSString *)streamName
+                  withWidth:(int)width
+                  andHeight:(int)height
+                  andScreenWidth:(int)screenWidth
+                  andScreenHeight:(int)screenHeight) {
+
     [r5View updateScaleSize:streamName
                   withWidth:width
                   andHeight:height
              andScreenWidth:screenWidth
             andScreenHeight:screenHeight];
+
 }
 
 RCT_EXPORT_METHOD(setPermissionsFlag:(BOOL)flag) {
