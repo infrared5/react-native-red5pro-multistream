@@ -126,6 +126,7 @@
 
     [stream setClient:self];
     [stream setDelegate:self];
+    [self setLogLevel:_level];
 
     _stream = stream;
     _connection = connection;
@@ -268,19 +269,6 @@
 
 # pragma R5Stream:client
 - (void)onMetaData:(NSString *)params {
-
-    NSArray *paramListing = [params componentsSeparatedByString:@";"];
-    for (id param in paramListing) {
-        NSArray *keyValue = [(NSString *)param componentsSeparatedByString:@"="];
-        NSString *key = (NSString *)[keyValue objectAtIndex:0];
-        if ([key  isEqual: @"streamingMode"]) {
-//            NSString *streamMode = (NSString *)[keyValue objectAtIndex:1];
-        }
-        else if ([key isEqual: @"orientation"]) {
-            // FOR SUBSCRIBERS ->
-//            [self updateOrientation:[[keyValue objectAtIndex:1] intValue]];
-        }
-    }
 
     [_proxy onStreamMetaDataEvent:_streamName andMessage:@{@"metadata": params}];
 

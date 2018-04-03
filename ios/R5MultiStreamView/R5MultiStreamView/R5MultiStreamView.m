@@ -9,6 +9,7 @@
 #import <objc/runtime.h>
 #import "R5MultiStreamView.h"
 #import "R5PublisherStream.h"
+#import "R5SubscriberStream.h"
 
 @interface R5MultiStreamView() {
 
@@ -82,26 +83,35 @@
      andWithVideo:(BOOL)withVideo
      andAudioMode:(int)audioMode {
 
-    /*
-  if (_playbackVideo) {
-    [self.controller setScaleMode:_scaleMode];
-  }
+    R5SubscriberStream *subscriber = NULL;
+    if (withVideo) {
+        subscriber = [[R5SubscriberStream alloc] initWithEventProxy:self andView:[self createVideoView]];
+    }
+    else {
+        subscriber = [[R5SubscriberStream alloc] initWithEventProxy:self];
+    }
 
-  [self.stream setAudioController:[[R5AudioController alloc] initWithMode:_audioMode]];
+    [subscriber setConfiguration:[self createConfiguration:streamName withHost:host andContext:context]];
+    [_streamMap setObject:subscriber forKey:streamName];
 
-  [self.stream play:streamName];
-     */
-
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.onConfigured) {
+            self.onConfigured(@{@"key": streamName});
+        }
+    });
 }
 
 - (void)unsubscribe:(NSString *) streamName {
 
-    /*
     R5SubsriberStream *stream = (R5SubsriberStream *)[_streamMap objectForKey:streamName];
     if (stream != NULL) {
         [stream stop];
+        R5VideoViewController *controller = [stream getView];
+        if (controller != NULL) {
+            [controller removeFromParentViewController];
+        }
+        [_streamMap removeObjectForKey:streamName];
     }
-     */
 
 }
 
@@ -147,6 +157,11 @@ andCameraHeight:(int)height
     R5PublisherStream *stream = (R5PublisherStream *)[_streamMap objectForKey:streamName];
     if (stream != NULL) {
         [stream stop];
+        R5VideoViewController *controller = [stream getView];
+        if (controller != NULL) {
+            [controller removeFromParentViewController];
+        }
+        [_streamMap removeObjectForKey:streamName];
     }
 
 }
@@ -190,29 +205,13 @@ andCameraHeight:(int)height
 
 }
 
-- (void)updateOrientation:(int)value {
-
-  if (_currentRotation == value) {
-    return;
-  }
-  _currentRotation = value;
-  [self.controller.view.layer setTransform:CATransform3DMakeRotation(value, 0.0, 0.0, 0.0)];
-
-}
-
-
-- (void)tearDown {
-
-    if (self.stream != nil) {
-        [self.stream setDelegate:nil];
-        [self.stream setClient:nil];
-    }
-
-    _isStreaming = NO;
-
-}
-
 - (void)shutdown {
+
+    for (id key in _streamMap) {
+        id<Stream> stream = (id<Stream>)[_streamMap objectForKey:key];
+        [stream stop];
+    }
+    [_streamMap removeAllObjects];
 
 }
 
