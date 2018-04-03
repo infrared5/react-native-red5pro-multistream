@@ -26,7 +26,7 @@
               andStreamType:(int)type
                   andUseABR:(BOOL)usABR;
 
--(void)swapCamera;
+- (void)swapCamera;
 - (void)setDeviceOrientation:(UIDeviceOrientation)orientation;
 
 @end

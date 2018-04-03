@@ -43,10 +43,6 @@
 
 @interface R5MultiStreamView : RCTView <EventEmitterProxy>
 
-@property R5Stream *stream;
-@property R5Connection *connection;
-@property R5VideoViewController *controller;
-
 - (void)onDeviceOrientation:(NSNotification *)notification;
 
 # pragma RN Events
