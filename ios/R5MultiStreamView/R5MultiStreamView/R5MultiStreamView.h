@@ -95,6 +95,14 @@ andCameraHeight:(int)height
 - (void)setLogLevel:(int)level;
 @property (setter=setLogLevel:, getter=getLogLevel) int logLevel;
 
+- (NSString *)getLicenseKey;
+- (void)setLicenseKey:(NSString *)value;
+@property (setter=setLicenseKey:, getter=getLicenseKey) NSString *licenseKey;
+
+- (NSString *)getBundleID;
+- (void)setBundleID:(NSString *)value;
+@property (setter=setBundleID:, getter=getBundleID) NSString *bundleID;
+
 @end
 
 #endif /* R5MultiStreamView_h */

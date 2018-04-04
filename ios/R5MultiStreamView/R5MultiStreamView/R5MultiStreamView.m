@@ -92,6 +92,10 @@
     }
 
     [subscriber setConfiguration:[self createConfiguration:streamName withHost:host andContext:context]];
+
+    // TODO: If not in background ->
+    [subscriber start];
+
     [_streamMap setObject:subscriber forKey:streamName];
 
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -140,6 +144,7 @@ andCameraHeight:(int)height
                   andStreamType:publishMode
                       andUseABR:_useAdaptiveBitrateController];
 
+    [publisher start];
     [_streamMap setObject:publisher forKey:streamName];
 
     dispatch_async(dispatch_get_main_queue(), ^{
