@@ -137,6 +137,7 @@
     
     if (_useAudio) {
         _microphone = [self setUpMicrophone];
+        [_stream attachAudio:_microphone];
     }
     
     if (useABR) {
