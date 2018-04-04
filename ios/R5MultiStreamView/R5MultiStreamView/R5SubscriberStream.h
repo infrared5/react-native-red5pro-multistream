@@ -20,4 +20,6 @@
 
 - (void)setConfiguration:(R5Configuration *)configuration;
 
+@end
+
 #endif /* R5SubscriberStream_h */

@@ -103,7 +103,7 @@
 
 - (void)unsubscribe:(NSString *) streamName {
 
-    R5SubsriberStream *stream = (R5SubsriberStream *)[_streamMap objectForKey:streamName];
+    R5SubscriberStream *stream = (R5SubscriberStream *)[_streamMap objectForKey:streamName];
     if (stream != NULL) {
         [stream stop];
         R5VideoViewController *controller = [stream getView];
@@ -266,13 +266,15 @@ andCameraHeight:(int)height
 }
 
 - (BOOL)getShowDebugInfo {
-  return _showDebugInfo;
+    return _showDebugInfo;
 }
 - (void)setShowDebugInfo:(BOOL)show {
-  _showDebugInfo = show;
-  if (self.controller != nil) {
-    [self.controller showDebugInfo:show];
-  }
+    _showDebugInfo = show;
+//    for (id key in _streamMap) {
+//        id<Stream> stream = (id<Stream>)[_streamMap objectForKey:key];
+//        [stream showDebugInfo:show];
+//    }
+//
 }
 
 - (int)getLogLevel {
