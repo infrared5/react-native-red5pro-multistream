@@ -173,9 +173,9 @@ andCameraHeight:(int)height
 
 - (void)updateScaleSize:(NSString *)streamName
               withWidth:(int)width
-             withHeight:(int)height
-        withScreenWidth:(int)screenWidth
-       withScreenHeight:(int)screenHeight {
+             andHeight:(int)height
+        andScreenWidth:(int)screenWidth
+       andScreenHeight:(int)screenHeight {
 
     for (id key in _streamMap) {
         id<Stream> stream = (id<Stream>)[_streamMap objectForKey:key];
