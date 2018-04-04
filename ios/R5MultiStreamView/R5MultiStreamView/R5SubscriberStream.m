@@ -21,7 +21,7 @@
     
     int _logLevel;
     BOOL _isStreaming;
-    int _currentOrientation;
+    int _currentRotation;
     
     BOOL _isActive;
     BOOL _isRetry;
@@ -29,7 +29,7 @@
     int _retryLimit;
     
 }
-@end;
+@end
 
 @implementation R5SubscriberStream
 
@@ -72,7 +72,7 @@
     
     [stream setClient:self];
     [stream setDelegate:self];
-    [self setLogLevel:_level];
+    [self setLogLevel:_logLevel];
     
     _stream = stream;
     _connection = connection;
@@ -190,11 +190,11 @@
     else if (statusCode == r5_status_connection_error && [msg isEqualToString:@"No Valid Media Found"]) {
         if (_retryCount++ < _retryLimit) {
             _isRetry = YES;
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2.0 * NSEC_PER_SEC) dispatch_get_main_queue(), ^{
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2.0 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
                 if (_isActive) {
                     [self resume];
                 }
-            })
+            });
             return;
         }
         else {

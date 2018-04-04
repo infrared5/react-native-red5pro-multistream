@@ -28,7 +28,7 @@
     BOOL _isStreaming;
     
 }
-@end;
+@end
 
 @implementation R5PublisherStream
 
@@ -126,7 +126,7 @@
         
     [stream setClient:self];
     [stream setDelegate:self];
-    [self setLogLevel:_level];
+    [self setLogLevel:_logLevel];
         
     _stream = stream;
     _connection = connection;
@@ -170,7 +170,7 @@
 
 - (void)setDeviceOrientation:(UIDeviceOrientation)orientation {
     
-    R5Camera *camera = (R5Camera *)[self.stream getVideoSource];
+    R5Camera *camera = (R5Camera *)[_stream getVideoSource];
     if (camera != NULL) {
         
         if (orientation == UIDeviceOrientationPortraitUpsideDown) {
