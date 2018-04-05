@@ -39,7 +39,7 @@
     if (self = [super init]) {
 
       _logLevel = 3;
-      _showDebugInfo = NO;
+      _showDebugInfo = YES;
       _bitrate = 750;
       _framerate = 15;
       _bufferTime = 0.5;
@@ -55,7 +55,6 @@
 
 - (R5VideoViewController *)createVideoView {
     R5VideoViewController *ctrl = [[R5VideoViewController alloc] init];
-    [ctrl setView:self];
     return ctrl;
 }
 
@@ -99,6 +98,13 @@
     [_streamMap setObject:subscriber forKey:streamName];
 
     dispatch_async(dispatch_get_main_queue(), ^{
+        if (withVideo) {
+            R5VideoViewController *ctrl = [subscriber getView];
+            [ctrl showPreview:YES];
+            [ctrl setView:self];
+            [ctrl setFrame:self.frame];
+            [self layoutSubviews];
+        }
         if (self.onConfigured) {
             self.onConfigured(@{@"key": streamName});
         }
@@ -112,7 +118,10 @@
         [stream stop];
         R5VideoViewController *controller = [stream getView];
         if (controller != NULL) {
-            [controller removeFromParentViewController];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [controller.view removeFromSuperview];
+                [controller removeFromParentViewController];
+            });
         }
         [_streamMap removeObjectForKey:streamName];
     }
@@ -147,6 +156,15 @@ andCameraHeight:(int)height
     [publisher start];
     [_streamMap setObject:publisher forKey:streamName];
 
+
+    if (withVideo) {
+        R5VideoViewController *ctrl = [publisher getView];
+        [ctrl showPreview:YES];
+        [ctrl showDebugInfo:_showDebugInfo];
+        [ctrl setView:self];
+        [ctrl setFrame:self.frame];
+        [self layoutSubviews];
+    }
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.onConfigured) {
             self.onConfigured(@{@"key": streamName});
@@ -162,10 +180,6 @@ andCameraHeight:(int)height
     R5PublisherStream *stream = (R5PublisherStream *)[_streamMap objectForKey:streamName];
     if (stream != NULL) {
         [stream stop];
-        R5VideoViewController *controller = [stream getView];
-        if (controller != NULL) {
-            [controller removeFromParentViewController];
-        }
         [_streamMap removeObjectForKey:streamName];
     }
 
@@ -220,6 +234,10 @@ andCameraHeight:(int)height
 
 }
 
+- (void)setPermissionsFlag:(BOOL)flag {
+
+}
+
 #pragma NSNotificationDelegate
 - (void)onDeviceOrientation:(NSNotification *)notification {
 
@@ -259,7 +277,9 @@ andCameraHeight:(int)height
     });
 }
 - (void)onStreamSubscriberStatus:(NSString *)streamName andMessage:(NSDictionary *)message {
-
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.onSubscriberStreamStatus(message);
+    });
 }
 - (void)onStreamUnpublishNotification:(NSString *)streamName andMessage:(NSDictionary *)message {
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -267,7 +287,9 @@ andCameraHeight:(int)height
     });
 }
 - (void)onStreamUnsubscribeNotification:(NSString *)streamName andMessage:(NSDictionary *)message {
-
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.onUnsubscribeNotification(message);
+    });
 }
 
 - (BOOL)getShowDebugInfo {
@@ -275,11 +297,13 @@ andCameraHeight:(int)height
 }
 - (void)setShowDebugInfo:(BOOL)show {
     _showDebugInfo = show;
-//    for (id key in _streamMap) {
-//        id<Stream> stream = (id<Stream>)[_streamMap objectForKey:key];
-//        [stream showDebugInfo:show];
-//    }
-//
+    for (id key in _streamMap) {
+        id<Stream> stream = (id<Stream>)[_streamMap objectForKey:key];
+        R5VideoViewController *controller = [stream getView];
+        if (controller != NULL) {
+            [controller showDebugInfo:show];
+        }
+    }
 }
 
 - (int)getLogLevel {

@@ -226,6 +226,10 @@
             [_stream attachVideo:NULL];
         }
         if (_view != NULL) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [_view.view removeFromSuperview];
+                [_view removeFromParentViewController];
+            });
             [_view attachStream:NULL];
             _view = NULL;
         }
