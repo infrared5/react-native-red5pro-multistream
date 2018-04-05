@@ -74,13 +74,13 @@
     [stream setDelegate:self];
     [self setLogLevel:_logLevel];
     
+    if (_view != NULL) {
+        [_view attachStream:stream];
+    }
+    [stream setAudioController:[[R5AudioController alloc] init]];
+    
     _stream = stream;
     _connection = connection;
-    
-    [_stream setAudioController:[[R5AudioController alloc] init]];
-    if (_view != NULL) {
-        [_view attachStream:_stream];
-    }
     _isActive = YES;
     
 }
@@ -88,6 +88,9 @@
 # pragma Stream
 - (void)start {
     
+    if (_view != NULL) {
+        [_view setScaleMode:r5_scale_fill];
+    }
     [_stream play:_streamName];
     
 }
@@ -97,7 +100,11 @@
     if (_stream != NULL) {
 
         if (_view != NULL) {
-            [_view attachStream:NULL];
+//            [_view attachStream:NULL];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [_view.view removeFromSuperview];
+                [_view removeFromParentViewController];
+            });
             _view = NULL;
         }
         
@@ -119,6 +126,7 @@
         [_stream setClient:NULL];
         [_stream stop];
         _stream = NULL;
+        
     }
     
 }
