@@ -24,9 +24,6 @@
 - (void)stop;
 - (void)pause;
 - (void)resume;
-- (void)updateScaleSize:(int)width withHeight:(int)height andScreenWidth:(int)screenWidth andScreenHeight:(int)screenHeight;
-- (int)getLogLevel;
-- (void)setLogLevel:(int)value;
 - (R5VideoViewController *)getView;
 
 @end
@@ -43,6 +40,9 @@
 
 @interface R5MultiStreamView : RCTView <EventEmitterProxy>
 
+- (void)willPause;
+- (void)willResume;
+- (void)willDestroy;
 - (void)onDeviceOrientation:(NSNotification *)notification;
 
 # pragma RN Events
@@ -73,9 +73,6 @@ andCameraHeight:(int)height
 - (void)unpublish:(NSString *)streamName;
 
 - (void)swapCamera:(NSString *)streamName;
-
-- (void)updateScaleMode:(NSString *)streamName
-               withMode:(int)mode;
 
 - (void)updateScaleSize:(NSString *)streamName
               withWidth:(int)width

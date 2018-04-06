@@ -21,6 +21,66 @@
 
 @implementation R5MultiStreamViewManager
 
+RCT_EXPORT_MODULE()
+
+@synthesize bridge = _bridge;
+
+- (instancetype)init {
+    self = [super init];
+    if ( self ) {
+        NSNotificationCenter * notificationCenter = [NSNotificationCenter defaultCenter];
+        [notificationCenter addObserver:self selector:@selector(applicationDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
+        [notificationCenter addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
+        [notificationCenter addObserver:self selector:@selector(applicationDidFinishLaunching:) name:UIApplicationDidFinishLaunchingNotification object:nil];
+        [notificationCenter addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
+        [notificationCenter addObserver:self selector:@selector(applicationWillResignActive:) name:UIApplicationWillResignActiveNotification object:nil];
+        [notificationCenter addObserver:self selector:@selector(applicationDidReceiveMemoryWarning:) name:UIApplicationDidReceiveMemoryWarningNotification object:nil];
+    }
+    
+    return self;
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)applicationDidEnterBackground:(NSNotification *)notification {
+    if (r5View != NULL) {
+//        [r5View willPause];
+    }
+//    [self dispatchAppEventWithName:@"ApplicationDidEnterBackground" body:nil];
+}
+
+- (void)applicationWillEnterForeground:(NSNotification *)notification {
+    [self dispatchAppEventWithName:@"ApplicationWillEnterBackground" body:nil];
+}
+
+- (void)applicationDidFinishLaunching:(NSNotification *)notification {
+    [self dispatchAppEventWithName:@"ApplicationDidFinishLaunching" body:nil];
+}
+
+- (void)applicationDidBecomeActive:(NSNotification *)notification {
+    if (r5View != NULL) {
+        [r5View willResume];
+    }
+//    [self dispatchAppEventWithName:@"ApplicationDidBecomeActive" body:nil];
+}
+
+- (void)applicationWillResignActive:(NSNotification *)notification {
+    if (r5View != NULL) {
+        [r5View willPause];
+    }
+//    [self dispatchAppEventWithName:@"ApplicationWillResignActive" body:nil];
+}
+
+- (void)applicationDidReceiveMemoryWarning:(NSNotification *)notification {
+    [self dispatchAppEventWithName:@"ApplicationDidReceiveMemoryWarning" body:nil];
+}
+
+- (void)dispatchAppEventWithName:(NSString *)name body:(NSDictionary *)body {
+//    [self.bridge.eventDispatcher sendAppEventWithName:name body:body];
+}
+
 # pragma RN Events
 RCT_EXPORT_VIEW_PROPERTY(onConfigured, RCTBubblingEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onMetaDataEvent, RCTBubblingEventBlock)
@@ -75,10 +135,6 @@ RCT_EXPORT_METHOD(swapCamera:(nonnull NSString *)streamName) {
     [r5View swapCamera:streamName];
 }
 
-RCT_EXPORT_METHOD(updateScaleMode:(nonnull NSString *)streamName withMode:(int)mode) {
-    [r5View updateScaleMode:streamName withMode:mode];
-}
-
 RCT_EXPORT_METHOD(updateScaleSize:(nonnull NSString *)streamName
                   withWidth:(int)width
                   andHeight:(int)height
@@ -112,21 +168,19 @@ RCT_EXPORT_VIEW_PROPERTY(streamBufferTime, float);
 RCT_EXPORT_VIEW_PROPERTY(useAdaptiveBitrateController, BOOL);
 
 RCT_CUSTOM_VIEW_PROPERTY(showDebugView, BOOL, R5MultiStreamView) {
-  [view setShowDebugInfo:[json boolValue]];
+    [r5View setShowDebugInfo:[json boolValue]];
 }
 
-RCT_EXPORT_MODULE()
-
 - (void)onDeviceOrientation:(NSNotification *)notification {
-  [r5View onDeviceOrientation:notification];
+    [r5View onDeviceOrientation:notification];
 }
 
 - (void)addObservers {
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onDeviceOrientation:) name:UIDeviceOrientationDidChangeNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onDeviceOrientation:) name:UIDeviceOrientationDidChangeNotification object:nil];
 }
 
 - (void)removeObservers {
-  [[NSNotificationCenter defaultCenter] removeObserver:self name:UIDeviceOrientationDidChangeNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIDeviceOrientationDidChangeNotification object:nil];
 }
 
 - (UIView *)view {

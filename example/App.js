@@ -82,7 +82,7 @@ export default class App extends React.Component {
         style: styles.videoView,
         licenseKey: licenseKey,
         bundleID: bundleID,
-        showDebug: true,
+        showDebugView: false,
         logLevel: R5LogLevel.DEBUG,
         onMetaData: this.onMetaData,
         onConfigured: this.onConfigured,
@@ -111,27 +111,6 @@ export default class App extends React.Component {
   }
 
   componentWillUpdate (nextProps, nextState) {
-    const currentSubs = this.state.subscriberList
-    const currentLength = currentSubs.length;
-    const nextSubs = nextState.subscriberList
-    if (currentLength < nextSubs.length) {
-      const newSubs = currentLength > 0 ? nextSubs.slice(currentLength - 1) : nextSubs
-      newSubs.map((sub, index) => {
-        const withVideo = sub.name.match(/r5pro2-video/)
-        const withAudio = sub.name.match(/r5pro2-audio/)
-        if (!withVideo && !withAudio) {
-          return false
-        }
-        console.log('SUBSCRIBE', sub)
-        subscribe(findNodeHandle(this.red5pro_multistream),
-          sub.name,
-          sub.serverAddress,
-          sub.scope.substring(1, sub.scope.length),
-          withVideo === null ? false : true)
-      })
-    } else if (currentLength > nextSubs.length) {
-      // TODO: unsubscribe
-    }
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -145,6 +124,31 @@ export default class App extends React.Component {
         'live',
         withVideo)
       this._checkForSubscriptionStreams(streamlistURL)
+    }
+
+    const currentSubs = prevState.subscriberList
+    const currentLength = currentSubs.length;
+    const nextSubs = this.state.subscriberList
+    console.log(currentSubs)
+    console.log('---')
+    console.log(nextSubs)
+    if (currentLength < nextSubs.length) {
+      const newSubs = currentLength > 0 ? nextSubs.slice(currentLength - 1) : nextSubs
+      newSubs.map((sub, index) => {
+        const withVideo = sub.name.match(/r5pro4-video/)
+        const withAudio = sub.name.match(/r5pro4-audio/)
+        if (!withVideo && !withAudio) {
+          return false
+        }
+        console.log('SUBSCRIBE', sub)
+        subscribe(findNodeHandle(this.red5pro_multistream),
+          sub.name,
+          sub.serverAddress,
+          sub.scope.substring(1, sub.scope.length),
+          withVideo === null ? false : true)
+      })
+    } else if (currentLength > nextSubs.length) {
+      // TODO: unsubscribe
     }
   }
 
@@ -162,7 +166,7 @@ export default class App extends React.Component {
         <View style={styles.container}>
           <R5MultiStreamView
             ref={assignVideoRef}
-            {...this.state.videoProps} 
+            {...this.state.videoProps}
           />
           {subscribers}
           <Button title="Toggle" onPress={this.onToggle} style={{ flex: 1, height: 60, flexBasis: 60 }} />
@@ -171,7 +175,7 @@ export default class App extends React.Component {
       )
     } else if (this.state.hasPermissions) {
       return (
-        <View style={[styles.container, { alignItems: 'center', justifyContent: 'space-between' }]}>
+        <View style={[styles.container, { alignItems: 'center', justifyContent: 'space-around' }]}>
           <Button style={{ marginBottom: 20 }} onPress={this.onPublishAudio} title="Publish Audio" />
           <Button onPress={this.onPublish} title="Publish Video+Audio" />
         </View>
@@ -189,8 +193,8 @@ export default class App extends React.Component {
     const mystream = this.state.streamName
     const currentStreamList = this.state.subscriberList
     const availableSubscribers = json.filter((stream, index) => {
-      const withVideo = stream.name.match(/r5pro2-video/)
-      const withAudio = stream.name.match(/r5pro2-audio/)
+      const withVideo = stream.name.match(/r5pro4-video/)
+      const withAudio = stream.name.match(/r5pro4-audio/)
       let i = currentStreamList.length
       while (--i > -1) {
         if (currentStreamList[i].name === stream.name) {
@@ -267,17 +271,6 @@ export default class App extends React.Component {
 
   onConfigured (event) {
     console.log(`onConfigured :: ${event.nativeEvent.key}`)
-    /*
-    this.refs.video.setState({
-      configured: true
-    })
-    if (this.state.isPublisher) {
-      publish(findNodeHandle(this.refs.video), this.state.videoProps.configuration.streamName)
-    }
-    else {
-      subscribe(findNodeHandle(this.refs.video), this.state.videoProps.configuration.streamName)
-    }
-    */
   }
 
   onPublisherStreamStatus (event) {
@@ -351,7 +344,7 @@ export default class App extends React.Component {
   onPublish () {
     const randomId = Math.floor(Math.random() * 0x10000).toString(16)
     this.setState({
-      streamName: 'r5pro2-videoStream-' + randomId,
+      streamName: 'r5pro4-videoStream-' + randomId,
       publisherSelection: PubType.VIDEO
     })
   }
@@ -359,7 +352,7 @@ export default class App extends React.Component {
   onPublishAudio () {
     const randomId = Math.floor(Math.random() * 0x10000).toString(16)
     this.setState({
-      streamName: 'r5pro2-audioStream-' + randomId,
+      streamName: 'r5pro4-audioStream-' + randomId,
       publisherSelection: PubType.AUDIO
     })
   }
@@ -397,7 +390,7 @@ const styles = StyleSheet.create({
   videoView: {
     flex: 1,
     flexDirection: 'row',
-    // justifyContent: 'center',
+    justifyContent: 'center',
     backgroundColor: 'black'
   },
   subscriberTag: {

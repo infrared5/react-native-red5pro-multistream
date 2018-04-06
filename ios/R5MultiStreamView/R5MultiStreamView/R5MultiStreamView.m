@@ -27,6 +27,10 @@
     BOOL _isStreaming;
     int _currentRotation;
     
+    BOOL _isResumable;
+    BOOL _isInBackground;
+    BOOL _isCheckingPermissions;
+    
     NSMutableDictionary *_streamMap;
     
 }
@@ -38,15 +42,19 @@
   
     if (self = [super init]) {
     
-      _logLevel = 3;
-      _showDebugInfo = YES;
-      _bitrate = 750;
-      _framerate = 15;
-      _bufferTime = 0.5;
-      _streamBufferTime = 2.0;
-      _useAdaptiveBitrateController = NO;
+        _logLevel = 3;
+        _showDebugInfo = YES;
+        _bitrate = 750;
+        _framerate = 15;
+        _bufferTime = 0.5;
+        _streamBufferTime = 2.0;
+        _useAdaptiveBitrateController = NO;
       
-      _streamMap = [[NSMutableDictionary alloc] initWithCapacity:4];
+        _streamMap = [[NSMutableDictionary alloc] initWithCapacity:4];
+        r5_set_log_level(_logLevel);
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appWillResignActive:) name:UIApplicationWillResignActiveNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appWillTerminate:) name:UIApplicationWillTerminateNotification object:nil];
     
     }
     return self;
@@ -82,49 +90,45 @@
      andWithVideo:(BOOL)withVideo
      andAudioMode:(int)audioMode {
   
-    R5SubscriberStream *subscriber = NULL;
-    if (withVideo) {
-        subscriber = [[R5SubscriberStream alloc] initWithEventProxy:self andView:[self createVideoView]];
-    }
-    else {
-        subscriber = [[R5SubscriberStream alloc] initWithEventProxy:self];
-    }
-  
-    [subscriber setConfiguration:[self createConfiguration:streamName withHost:host andContext:context]];
-
-    // TODO: If not in background ->
-    [subscriber start];
-    
-    [_streamMap setObject:subscriber forKey:streamName];
-    
     dispatch_async(dispatch_get_main_queue(), ^{
+        
+        R5SubscriberStream *subscriber = NULL;
+        if (withVideo) {
+            subscriber = [[R5SubscriberStream alloc] initWithEventProxy:self andView:[self createVideoView]];
+        }
+        else {
+            subscriber = [[R5SubscriberStream alloc] initWithEventProxy:self];
+        }
+        
+        [subscriber setConfiguration:[self createConfiguration:streamName withHost:host andContext:context]];
+        [_streamMap setObject:subscriber forKey:streamName];
+        
         if (withVideo) {
             R5VideoViewController *ctrl = [subscriber getView];
-            [ctrl showPreview:YES];
             [ctrl setView:self];
-            [ctrl setFrame:self.frame];
-            [self layoutSubviews];
+            UIViewController *rootVc = [UIApplication sharedApplication].delegate.window.rootViewController;
+            [ctrl setFrame:rootVc.view.frame];
+            [ctrl showDebugInfo:_showDebugInfo];
         }
+        // TODO: If not in background ->
+        [subscriber start];
+        
         if (self.onConfigured) {
             self.onConfigured(@{@"key": streamName});
         }
+        
     });
 }
 
 - (void)unsubscribe:(NSString *) streamName {
   
-    R5SubscriberStream *stream = (R5SubscriberStream *)[_streamMap objectForKey:streamName];
-    if (stream != NULL) {
-        [stream stop];
-        R5VideoViewController *controller = [stream getView];
-        if (controller != NULL) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [controller.view removeFromSuperview];
-                [controller removeFromParentViewController];
-            });
+    dispatch_async(dispatch_get_main_queue(), ^{
+        id<Stream> stream = (id<Stream>)[_streamMap objectForKey:streamName];
+        if (stream != NULL) {
+            [stream stop];
+            [_streamMap removeObjectForKey:streamName];
         }
-        [_streamMap removeObjectForKey:streamName];
-    }
+    });
     
 }
 
@@ -136,52 +140,55 @@
 andCameraHeight:(int)height
         andMode:(int)publishMode {
   
-    R5PublisherStream *publisher = NULL;
-    
-    if (withVideo) {
-        publisher = [[R5PublisherStream alloc] initWithEventProxy:self andView:[self createVideoView]];
-    }
-    else {
-        publisher = [[R5PublisherStream alloc] initWithEventProxy:self];
-    }
-    
-    [publisher setConfiguration:[self createConfiguration:streamName withHost:host andContext:context]
-                 andCameraWidth:width
-                andCameraHeight:height
-                     andBitrate:_bitrate
-                   andFramerate:_framerate
-                  andStreamType:publishMode
-                      andUseABR:_useAdaptiveBitrateController];
-    
-    [publisher start];
-    [_streamMap setObject:publisher forKey:streamName];
-    
-    
-    if (withVideo) {
-        R5VideoViewController *ctrl = [publisher getView];
-        [ctrl showPreview:YES];
-        [ctrl showDebugInfo:_showDebugInfo];
-        [ctrl setView:self];
-        [ctrl setFrame:self.frame];
-        [self layoutSubviews];
-    }
     dispatch_async(dispatch_get_main_queue(), ^{
+        
+        R5PublisherStream *publisher = NULL;
+        if (withVideo) {
+            publisher = [[R5PublisherStream alloc] initWithEventProxy:self andView:[self createVideoView]];
+        }
+        else {
+            publisher = [[R5PublisherStream alloc] initWithEventProxy:self];
+        }
+    
+        [publisher setConfiguration:[self createConfiguration:streamName withHost:host andContext:context]
+                     andCameraWidth:width
+                    andCameraHeight:height
+                         andBitrate:_bitrate
+                       andFramerate:_framerate
+                      andStreamType:publishMode
+                          andUseABR:_useAdaptiveBitrateController];
+    
+        [publisher start];
+        [_streamMap setObject:publisher forKey:streamName];
+    
+    
+        if (withVideo) {
+            R5VideoViewController *ctrl = [publisher getView];
+            [ctrl setView:self];
+            UIViewController *rootVc = [UIApplication sharedApplication].delegate.window.rootViewController;
+            [ctrl setFrame:rootVc.view.frame];
+            [ctrl showDebugInfo:_showDebugInfo];
+        }
+
         if (self.onConfigured) {
             self.onConfigured(@{@"key": streamName});
         }
+        
+        [self onDeviceOrientation:NULL];
+        
     });
     
-    [self onDeviceOrientation:NULL];
-  
 }
 
 - (void)unpublish:(NSString *)streamName {
 
-    R5PublisherStream *stream = (R5PublisherStream *)[_streamMap objectForKey:streamName];
-    if (stream != NULL) {
-        [stream stop];
-        [_streamMap removeObjectForKey:streamName];
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        id<Stream> stream = (id<Stream>)[_streamMap objectForKey:streamName];
+        if (stream != NULL) {
+            [stream stop];
+            [_streamMap removeObjectForKey:streamName];
+        }
+    });
   
 }
 
@@ -191,78 +198,108 @@ andCameraHeight:(int)height
         andScreenWidth:(int)screenWidth
        andScreenHeight:(int)screenHeight {
     
-    for (id key in _streamMap) {
-        id<Stream> stream = (id<Stream>)[_streamMap objectForKey:key];
-        R5VideoViewController *controller = [stream getView];
-        if (controller != NULL) {
-            CGRect b = self.frame;
-            [controller setFrame:CGRectMake(0.0, 0.0, b.size.width, b.size.height)];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIViewController *rootVc = [UIApplication sharedApplication].delegate.window.rootViewController;
+        CGSize size = rootVc.view.frame.size;
+        float xscale = (width * 1.0f) / (screenWidth * 1.0f);
+        float yscale = (height * 1.0f) / (screenHeight * 1.0f);
+        float dimsWidth = size.width;
+        float dimsHeight = size.height;
+        for (id key in _streamMap) {
+            id<Stream> stream = (id<Stream>)[_streamMap objectForKey:key];
+            R5VideoViewController *controller = [stream getView];
+            if (controller != NULL) {
+                [controller setFrame:CGRectMake(0.0, 0.0, dimsWidth * xscale, dimsHeight * yscale)];
+            }
         }
-    }
-    
-    /*
-    if (_playbackVideo) {
-        float xscale = (width*1.0f) / (screenWidth*1.0f);
-        float yscale = (height*1.0f) / (screenHeight*1.0f);
-        int dwidth = [[UIScreen mainScreen] bounds].size.width;
-        int dheight = [[UIScreen mainScreen] bounds].size.height;
+    });
 
-        NSLog(@"R5VideoView:: dims(%d, %d), in(%d, %d)", width, height, screenWidth, screenHeight);
-        NSLog(@"R5VideoView:: scale(%f, %f), screen(%d, %d)", xscale, yscale, dwidth, dheight);
-        [self.controller setFrame:CGRectMake(0.0, 0.0, dwidth * xscale, dheight * yscale)];
-    }
-     */
-    
 }
 
 - (void)swapCamera:(NSString *)streamName {
     
-    R5PublisherStream *stream = (R5PublisherStream *)[_streamMap objectForKey:streamName];
-    if (stream != NULL) {
-        [stream swapCamera];
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        id<Stream> stream = (id<Stream>)[_streamMap objectForKey:streamName];
+        if ([stream respondsToSelector:@selector(swapCamera)]) {
+            [(R5PublisherStream *)stream swapCamera];
+        }
+    });
     
 }
 
 - (void)shutdown {
     
-    for (id key in _streamMap) {
-        id<Stream> stream = (id<Stream>)[_streamMap objectForKey:key];
-        [stream stop];
-    }
-    [_streamMap removeAllObjects];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        for (id key in _streamMap) {
+            id<Stream> stream = (id<Stream>)[_streamMap objectForKey:key];
+            [stream stop];
+        }
+        [_streamMap removeAllObjects];
+    });
     
 }
 
 - (void)setPermissionsFlag:(BOOL)flag {
-    
+    _isCheckingPermissions = flag;
 }
 
 #pragma NSNotificationDelegate
+- (void)willPause {
+    _isInBackground = YES;
+    if (_isCheckingPermissions) {
+        return;
+    }
+    
+    _isResumable = YES;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        for (id key in _streamMap) {
+            id<Stream> stream = (id<Stream>)[_streamMap objectForKey:key];
+            [stream pause];
+            if ([stream respondsToSelector:@selector(swapCamera)]) { // its a publisher...
+                [_streamMap removeObjectForKey:key];
+            }
+        }
+    });
+    
+}
+- (void)willResume {
+    _isInBackground = NO;
+    if (!_isResumable) {
+        return;
+    }
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        for (id key in _streamMap) {
+            id<Stream> stream = (id<Stream>)[_streamMap objectForKey:key];
+            [stream resume];
+        }
+    });
+    _isResumable = NO;
+    
+}
+- (void)willDestroy {
+    _isCheckingPermissions = NO;
+    _isInBackground = NO;
+    _isResumable = NO;
+    [self shutdown];
+}
+
 - (void)onDeviceOrientation:(NSNotification *)notification {
   
-    for (id key in _streamMap) {
-        id<Stream> stream = (id<Stream>)[_streamMap objectForKey:key];
-        R5PublisherStream *publisher = (R5PublisherStream *)stream;
-        if (publisher != NULL) {
-            [publisher setDeviceOrientation:[UIDevice currentDevice].orientation];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        for (id key in _streamMap) {
+            id<Stream> stream = (id<Stream>)[_streamMap objectForKey:key];
+            if ([stream respondsToSelector:@selector(setDeviceOrientation:)]) {
+                [(R5PublisherStream *)stream setDeviceOrientation:[UIDevice currentDevice].orientation];
+            }
         }
-    }
+    });
 
 }
 
 - (void)layoutSubviews {
   
     [super layoutSubviews];
-    for (id key in _streamMap) {
-        id<Stream> stream = (id<Stream>)[_streamMap objectForKey:key];
-        R5VideoViewController *controller = [stream getView];
-        if (controller != NULL) {
-            CGRect b = self.frame;
-            [controller setFrame:CGRectMake(0.0, 0.0, b.size.width, b.size.height)];
-        }
-    }
-  
 }
 
 # pragma EventEmitterProxy
@@ -297,13 +334,15 @@ andCameraHeight:(int)height
 }
 - (void)setShowDebugInfo:(BOOL)show {
     _showDebugInfo = show;
-    for (id key in _streamMap) {
-        id<Stream> stream = (id<Stream>)[_streamMap objectForKey:key];
-        R5VideoViewController *controller = [stream getView];
-        if (controller != NULL) {
-            [controller showDebugInfo:show];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        for (id key in _streamMap) {
+            id<Stream> stream = (id<Stream>)[_streamMap objectForKey:key];
+            R5VideoViewController *controller = [stream getView];
+            if (controller != NULL) {
+                [controller showDebugInfo:show];
+            }
         }
-    }
+    });
 }
 
 - (int)getLogLevel {

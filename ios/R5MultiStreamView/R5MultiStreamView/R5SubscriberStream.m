@@ -19,7 +19,6 @@
     R5VideoViewController *_view;
     id<EventEmitterProxy> _proxy;
     
-    int _logLevel;
     BOOL _isStreaming;
     int _currentRotation;
     
@@ -62,7 +61,6 @@
 
 - (void)setConfiguration:(R5Configuration *)configuration {
     
-    _logLevel = 3;
     _retryLimit = 3;
     _streamName = configuration.streamName;
     
@@ -72,12 +70,11 @@
     
     [stream setClient:self];
     [stream setDelegate:self];
-    [self setLogLevel:_logLevel];
     
     if (_view != NULL) {
         [_view attachStream:stream];
+        [_view showPreview:YES];
     }
-    [stream setAudioController:[[R5AudioController alloc] init]];
     
     _stream = stream;
     _connection = connection;
@@ -91,6 +88,7 @@
     if (_view != NULL) {
         [_view setScaleMode:r5_scale_fill];
     }
+    [_stream setAudioController:[[R5AudioController alloc] init]];
     [_stream play:_streamName];
     
 }
@@ -100,11 +98,9 @@
     if (_stream != NULL) {
 
         if (_view != NULL) {
-//            [_view attachStream:NULL];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [_view.view removeFromSuperview];
-                [_view removeFromParentViewController];
-            });
+            [_view attachStream:NULL];
+            [_view.view removeFromSuperview];
+            [_view removeFromParentViewController];
             _view = NULL;
         }
         
@@ -138,13 +134,6 @@
     
 }
 
-- (void)updateScaleSize:(int)width
-             withHeight:(int)height
-         andScreenWidth:(int)screenWidth
-        andScreenHeight:(int)screenHeight {
-    
-}
-
 - (void)updateOrientation:(int)value {
     
     if (_currentRotation == value) {
@@ -155,15 +144,6 @@
         [_view.view.layer setTransform:CATransform3DMakeRotation(value, 0.0, 0.0, 0.0)];
     }
     
-}
-
-- (int)getLogLevel {
-    return _logLevel;
-}
-
-- (void)setLogLevel:(int)value {
-    _logLevel = value;
-    r5_set_log_level(_logLevel);
 }
 
 - (R5VideoViewController *)getView {
