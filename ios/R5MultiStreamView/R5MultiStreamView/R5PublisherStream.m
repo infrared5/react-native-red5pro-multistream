@@ -21,7 +21,6 @@
     R5Camera *_camera;
     R5Microphone *_microphone;
 
-    int _logLevel;
     int _streamType;
     BOOL _useAudio;
     BOOL _useBackfacingCamera;
@@ -113,7 +112,6 @@
               andStreamType:(int)type
                   andUseABR:(BOOL)useABR {
 
-    _logLevel = 3;
     _useAudio = YES;
     _useBackfacingCamera = NO;
 
@@ -126,7 +124,6 @@
 
     [stream setClient:self];
     [stream setDelegate:self];
-    [self setLogLevel:_logLevel];
 
     _stream = stream;
     _connection = connection;
@@ -211,10 +208,6 @@
     [_stream publish:_streamName type:_streamType];
     [_stream updateStreamMeta];
 
-    if (_view != NULL) {
-        [_view showPreview:YES];
-    }
-
 }
 
 - (void)stop {
@@ -226,11 +219,9 @@
             [_stream attachVideo:NULL];
         }
         if (_view != NULL) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [_view.view removeFromSuperview];
-                [_view removeFromParentViewController];
-            });
             [_view attachStream:NULL];
+            [_view.view removeFromSuperview];
+            [_view removeFromParentViewController];
             _view = NULL;
         }
 
@@ -250,22 +241,6 @@
 
 - (void)resume {
     // nada.
-}
-
-- (void)updateScaleSize:(int)width
-             withHeight:(int)height
-         andScreenWidth:(int)screenWidth
-        andScreenHeight:(int)screenHeight {
-
-}
-
-- (int)getLogLevel {
-    return _logLevel;
-}
-
-- (void)setLogLevel:(int)value {
-    _logLevel = value;
-    r5_set_log_level(_logLevel);
 }
 
 - (R5VideoViewController *)getView {
