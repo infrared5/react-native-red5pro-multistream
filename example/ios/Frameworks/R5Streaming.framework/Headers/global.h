@@ -23,8 +23,8 @@ extern "C" {
 
 #define R5PRO_MAJOR_VERSION         4
 #define R5PRO_MINOR_VERSION         5
-#define R5PRO_REVISION              6
-#define R5PRO_BUILD                 0
+#define R5PRO_REVISION              8
+#define R5PRO_BUILD                 2
 
 #define R5PRO_VERSION               STRINGIFY(R5PRO_MAJOR_VERSION.R5PRO_MINOR_VERSION.R5PRO_REVISION.R5PRO_BUILD)
 #define R5PRO_VERSION_ISRELEASE     0
@@ -169,7 +169,7 @@ extern "C" {
     int requires_sdk_license();
     int r5_valid_license(client_ctx* ctx, const void* license);
     void r5_validate_license(client_ctx* ctx, const char* license, const char* stream_name, int publish_type);
-    void r5_cancel_license_validation();
+    void r5_cancel_license_validation(client_ctx* ctx);
 
     /**
      *  @return The current logging level for the R5 Pro library
