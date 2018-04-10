@@ -147,6 +147,7 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
         R5VideoView view = new R5VideoView(mContext);
         view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         view.setBackgroundColor(Color.BLACK);
+        view.showDebugView(showDebug);
         addView(view);
         return view;
 
