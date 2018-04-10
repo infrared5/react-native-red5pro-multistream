@@ -12,6 +12,7 @@
 		00C302E81ABCBA2D00DB3ED1 /* libRCTImage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302C01ABCB91800DB3ED1 /* libRCTImage.a */; };
 		00C302E91ABCBA2D00DB3ED1 /* libRCTNetwork.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302DC1ABCB9D200DB3ED1 /* libRCTNetwork.a */; };
 		00C302EA1ABCBA2D00DB3ED1 /* libRCTVibration.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302E41ABCB9EE00DB3ED1 /* libRCTVibration.a */; };
+		0891859959FC4C95A5204527 /* libR5MultiStreamView.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7671F32BC59E43FABBEE812F /* libR5MultiStreamView.a */; };
 		133E29F31AD74F7200F7D852 /* libRCTLinking.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 78C398B91ACF4ADC00677621 /* libRCTLinking.a */; };
 		139105C61AF99C1200B5F7CC /* libRCTSettings.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 139105C11AF99BAD00B5F7CC /* libRCTSettings.a */; };
 		139FDEF61B0652A700C62182 /* libRCTWebSocket.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 139FDEF41B06529B00C62182 /* libRCTWebSocket.a */; };
@@ -295,12 +296,12 @@
 			remoteGlobalIDString = 9D23B34F1C767B80008B4819;
 			remoteInfo = ReactNativePermissions;
 		};
-		486EE280206EE14600DFC4BF /* PBXContainerItemProxy */ = {
+		488E775C207C40E900017FA3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = E47923B060F2494997C6FA3E /* R5MultStreamView.xcodeproj */;
+			containerPortal = B24B6A09EFEC4A78B25F2BD2 /* R5MultiStreamView.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 4885C7AB1FBDFA7400E77415;
-			remoteInfo = R5MultStreamView;
+			remoteInfo = R5MultiStreamView;
 		};
 		5E9157321DD0AC6500FF2AA8 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -372,11 +373,12 @@
 		486EE22F206EDD1200DFC4BF /* VideoToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VideoToolbox.framework; path = System/Library/Frameworks/VideoToolbox.framework; sourceTree = SDKROOT; };
 		537B55CB598A49F9B42885AD /* libR5MultStreamView.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libR5MultStreamView.a; sourceTree = "<group>"; };
 		5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTAnimation.xcodeproj; path = "../node_modules/react-native/Libraries/NativeAnimation/RCTAnimation.xcodeproj"; sourceTree = "<group>"; };
+		7671F32BC59E43FABBEE812F /* libR5MultiStreamView.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libR5MultiStreamView.a; sourceTree = "<group>"; };
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
 		8060230C23C54A89A9CA860D /* libReactNativePermissions.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libReactNativePermissions.a; sourceTree = "<group>"; };
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
 		ADBDB91F1DFEBF0600ED6528 /* RCTBlob.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTBlob.xcodeproj; path = "../node_modules/react-native/Libraries/Blob/RCTBlob.xcodeproj"; sourceTree = "<group>"; };
-		E47923B060F2494997C6FA3E /* R5MultStreamView.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = R5MultStreamView.xcodeproj; path = "../node_modules/react-native-red5pro-multistream/ios/R5MultiStreamView/R5MultStreamView.xcodeproj"; sourceTree = "<group>"; };
+		B24B6A09EFEC4A78B25F2BD2 /* R5MultiStreamView.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = R5MultiStreamView.xcodeproj; path = "../node_modules/react-native-red5pro-multistream/ios/R5MultiStreamView/R5MultiStreamView.xcodeproj"; sourceTree = "<group>"; };
 		F64696EA19384F63BF2FB2C8 /* ReactNativePermissions.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = ReactNativePermissions.xcodeproj; path = "../node_modules/react-native-permissions/ios/ReactNativePermissions.xcodeproj"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -418,6 +420,7 @@
 				139FDEF61B0652A700C62182 /* libRCTWebSocket.a in Frameworks */,
 				C7EAC4623437460BA82B5301 /* libReactNativePermissions.a in Frameworks */,
 				371970AB07924FD5938CEDB3 /* libR5MultStreamView.a in Frameworks */,
+				0891859959FC4C95A5204527 /* libR5MultiStreamView.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -568,6 +571,7 @@
 			children = (
 				8060230C23C54A89A9CA860D /* libReactNativePermissions.a */,
 				537B55CB598A49F9B42885AD /* libR5MultStreamView.a */,
+				7671F32BC59E43FABBEE812F /* libR5MultiStreamView.a */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
@@ -580,10 +584,10 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		486EE27D206EE14600DFC4BF /* Products */ = {
+		488E7759207C40E900017FA3 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				486EE281206EE14600DFC4BF /* libR5MultStreamView.a */,
+				488E775D207C40E900017FA3 /* libR5MultiStreamView.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -622,7 +626,7 @@
 				00C302DF1ABCB9EE00DB3ED1 /* RCTVibration.xcodeproj */,
 				139FDEE61B06529A00C62182 /* RCTWebSocket.xcodeproj */,
 				F64696EA19384F63BF2FB2C8 /* ReactNativePermissions.xcodeproj */,
-				E47923B060F2494997C6FA3E /* R5MultStreamView.xcodeproj */,
+				B24B6A09EFEC4A78B25F2BD2 /* R5MultiStreamView.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -785,8 +789,8 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = 486EE27D206EE14600DFC4BF /* Products */;
-					ProjectRef = E47923B060F2494997C6FA3E /* R5MultStreamView.xcodeproj */;
+					ProductGroup = 488E7759207C40E900017FA3 /* Products */;
+					ProjectRef = B24B6A09EFEC4A78B25F2BD2 /* R5MultiStreamView.xcodeproj */;
 				},
 				{
 					ProductGroup = 00C302A81ABCB8CE00DB3ED1 /* Products */;
@@ -1083,11 +1087,11 @@
 			remoteRef = 486EE21B206EDC4200DFC4BF /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		486EE281206EE14600DFC4BF /* libR5MultStreamView.a */ = {
+		488E775D207C40E900017FA3 /* libR5MultiStreamView.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
-			path = libR5MultStreamView.a;
-			remoteRef = 486EE280206EE14600DFC4BF /* PBXContainerItemProxy */;
+			path = libR5MultiStreamView.a;
+			remoteRef = 488E775C207C40E900017FA3 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		5E9157331DD0AC6500FF2AA8 /* libRCTAnimation.a */ = {
@@ -1265,12 +1269,14 @@
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-permissions/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-red5pro-multistream/ios/R5MultiStreamView/R5MultiStreamView",
+					"$(SRCROOT)/../node_modules/react-native-red5pro-multistream/ios/R5MultiStreamView/R5MultiStreamView",
 				);
 				INFOPLIST_FILE = Red5ProMultiStreamExampleTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
@@ -1292,12 +1298,14 @@
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-permissions/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-red5pro-multistream/ios/R5MultiStreamView/R5MultiStreamView",
+					"$(SRCROOT)/../node_modules/react-native-red5pro-multistream/ios/R5MultiStreamView/R5MultiStreamView",
 				);
 				INFOPLIST_FILE = Red5ProMultiStreamExampleTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
@@ -1326,6 +1334,7 @@
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-permissions/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-red5pro-multistream/ios/R5MultiStreamView/R5MultiStreamView",
+					"$(SRCROOT)/../node_modules/react-native-red5pro-multistream/ios/R5MultiStreamView/R5MultiStreamView",
 				);
 				INFOPLIST_FILE = Red5ProMultiStreamExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -1353,6 +1362,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-permissions/ios/**",
+					"$(SRCROOT)/../node_modules/react-native-red5pro-multistream/ios/R5MultiStreamView/R5MultiStreamView",
 					"$(SRCROOT)/../node_modules/react-native-red5pro-multistream/ios/R5MultiStreamView/R5MultiStreamView",
 				);
 				INFOPLIST_FILE = Red5ProMultiStreamExample/Info.plist;
@@ -1383,11 +1393,13 @@
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-permissions/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-red5pro-multistream/ios/R5MultiStreamView/R5MultiStreamView",
+					"$(SRCROOT)/../node_modules/react-native-red5pro-multistream/ios/R5MultiStreamView/R5MultiStreamView",
 				);
 				INFOPLIST_FILE = "Red5ProMultiStreamExample-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
@@ -1419,11 +1431,13 @@
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-permissions/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-red5pro-multistream/ios/R5MultiStreamView/R5MultiStreamView",
+					"$(SRCROOT)/../node_modules/react-native-red5pro-multistream/ios/R5MultiStreamView/R5MultiStreamView",
 				);
 				INFOPLIST_FILE = "Red5ProMultiStreamExample-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
@@ -1456,6 +1470,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.REACT.Red5ProMultiStreamExample-tvOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1480,6 +1495,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
