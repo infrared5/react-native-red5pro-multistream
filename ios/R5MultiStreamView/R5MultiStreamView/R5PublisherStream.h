@@ -1,6 +1,5 @@
 //
 //  R5PublisherStream.h
-//  R5MultStreamView
 //
 //  Created by Todd Anderson on 4/2/18.
 //  Copyright © 2018 Red5Pro. All rights reserved.
