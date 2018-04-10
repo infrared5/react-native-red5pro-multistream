@@ -53,9 +53,6 @@
         _streamMap = [[NSMutableDictionary alloc] initWithCapacity:4];
         r5_set_log_level(_logLevel);
         
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appWillResignActive:) name:UIApplicationWillResignActiveNotification object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appWillTerminate:) name:UIApplicationWillTerminateNotification object:nil];
-    
     }
     return self;
     
