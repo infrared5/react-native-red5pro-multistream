@@ -98,7 +98,7 @@
     if (_stream != NULL) {
 
         if (_view != NULL) {
-            [_view attachStream:NULL];
+            [_view pauseRender];
             [_view.view removeFromSuperview];
             [_view removeFromParentViewController];
             _view = NULL;
