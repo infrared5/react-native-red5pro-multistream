@@ -82,7 +82,7 @@ export default class App extends React.Component {
         style: styles.videoView,
         licenseKey: licenseKey,
         bundleID: bundleID,
-        showDebugView: false,
+        showDebugView: true,
         logLevel: R5LogLevel.DEBUG,
         onMetaData: this.onMetaData,
         onConfigured: this.onConfigured,
