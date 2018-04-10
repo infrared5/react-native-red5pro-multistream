@@ -296,13 +296,6 @@
 			remoteGlobalIDString = 9D23B34F1C767B80008B4819;
 			remoteInfo = ReactNativePermissions;
 		};
-		488E775C207C40E900017FA3 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = B24B6A09EFEC4A78B25F2BD2 /* R5MultiStreamView.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 4885C7AB1FBDFA7400E77415;
-			remoteInfo = R5MultiStreamView;
-		};
 		5E9157321DD0AC6500FF2AA8 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */;
@@ -378,7 +371,6 @@
 		8060230C23C54A89A9CA860D /* libReactNativePermissions.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libReactNativePermissions.a; sourceTree = "<group>"; };
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
 		ADBDB91F1DFEBF0600ED6528 /* RCTBlob.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTBlob.xcodeproj; path = "../node_modules/react-native/Libraries/Blob/RCTBlob.xcodeproj"; sourceTree = "<group>"; };
-		B24B6A09EFEC4A78B25F2BD2 /* R5MultiStreamView.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = R5MultiStreamView.xcodeproj; path = "../node_modules/react-native-red5pro-multistream/ios/R5MultiStreamView/R5MultiStreamView.xcodeproj"; sourceTree = "<group>"; };
 		F64696EA19384F63BF2FB2C8 /* ReactNativePermissions.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = ReactNativePermissions.xcodeproj; path = "../node_modules/react-native-permissions/ios/ReactNativePermissions.xcodeproj"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -584,14 +576,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		488E7759207C40E900017FA3 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				488E775D207C40E900017FA3 /* libR5MultiStreamView.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		5E91572E1DD0AC6500FF2AA8 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -626,7 +610,6 @@
 				00C302DF1ABCB9EE00DB3ED1 /* RCTVibration.xcodeproj */,
 				139FDEE61B06529A00C62182 /* RCTWebSocket.xcodeproj */,
 				F64696EA19384F63BF2FB2C8 /* ReactNativePermissions.xcodeproj */,
-				B24B6A09EFEC4A78B25F2BD2 /* R5MultiStreamView.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -788,10 +771,6 @@
 			productRefGroup = 83CBBA001A601CBA00E9B192 /* Products */;
 			projectDirPath = "";
 			projectReferences = (
-				{
-					ProductGroup = 488E7759207C40E900017FA3 /* Products */;
-					ProjectRef = B24B6A09EFEC4A78B25F2BD2 /* R5MultiStreamView.xcodeproj */;
-				},
 				{
 					ProductGroup = 00C302A81ABCB8CE00DB3ED1 /* Products */;
 					ProjectRef = 00C302A71ABCB8CE00DB3ED1 /* RCTActionSheet.xcodeproj */;
@@ -1085,13 +1064,6 @@
 			fileType = archive.ar;
 			path = libReactNativePermissions.a;
 			remoteRef = 486EE21B206EDC4200DFC4BF /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		488E775D207C40E900017FA3 /* libR5MultiStreamView.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libR5MultiStreamView.a;
-			remoteRef = 488E775C207C40E900017FA3 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		5E9157331DD0AC6500FF2AA8 /* libRCTAnimation.a */ = {

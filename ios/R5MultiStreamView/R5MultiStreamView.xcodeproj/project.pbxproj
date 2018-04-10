@@ -11,6 +11,7 @@
 		4885C7B01FBDFA7400E77415 /* R5MultiStreamView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4885C7AF1FBDFA7400E77415 /* R5MultiStreamView.m */; };
 		4885C7B11FBDFA7400E77415 /* R5MultiStreamView.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4885C7AE1FBDFA7400E77415 /* R5MultiStreamView.h */; };
 		4885C7B91FBDFABD00E77415 /* R5MultiStreamViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4885C7B71FBDFABD00E77415 /* R5MultiStreamViewManager.m */; };
+		488E7773207C422F00017FA3 /* R5SubscriberStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 488E7771207C422F00017FA3 /* R5SubscriberStream.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -33,6 +34,9 @@
 		4885C7AF1FBDFA7400E77415 /* R5MultiStreamView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = R5MultiStreamView.m; sourceTree = "<group>"; };
 		4885C7B71FBDFABD00E77415 /* R5MultiStreamViewManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = R5MultiStreamViewManager.m; sourceTree = "<group>"; };
 		4885C7B81FBDFABD00E77415 /* R5MultiStreamViewManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = R5MultiStreamViewManager.h; sourceTree = "<group>"; };
+		488E7770207C422F00017FA3 /* R5SubscriberStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = R5SubscriberStream.h; sourceTree = "<group>"; };
+		488E7771207C422F00017FA3 /* R5SubscriberStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = R5SubscriberStream.m; sourceTree = "<group>"; };
+		488E7772207C422F00017FA3 /* R5PublisherStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = R5PublisherStream.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,7 +73,10 @@
 				4885C7B71FBDFABD00E77415 /* R5MultiStreamViewManager.m */,
 				4885C7AE1FBDFA7400E77415 /* R5MultiStreamView.h */,
 				4885C7AF1FBDFA7400E77415 /* R5MultiStreamView.m */,
+				488E7772207C422F00017FA3 /* R5PublisherStream.h */,
 				486EE195206ED3C500DFC4BF /* R5PublisherStream.m */,
+				488E7770207C422F00017FA3 /* R5SubscriberStream.h */,
+				488E7771207C422F00017FA3 /* R5SubscriberStream.m */,
 			);
 			path = R5MultiStreamView;
 			sourceTree = "<group>";
@@ -133,6 +140,7 @@
 			files = (
 				4885C7B01FBDFA7400E77415 /* R5MultiStreamView.m in Sources */,
 				486EE196206ED3C500DFC4BF /* R5PublisherStream.m in Sources */,
+				488E7773207C422F00017FA3 /* R5SubscriberStream.m in Sources */,
 				4885C7B91FBDFABD00E77415 /* R5MultiStreamViewManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
