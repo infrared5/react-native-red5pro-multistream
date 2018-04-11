@@ -164,7 +164,10 @@
         }
     }
 
-    [_proxy onStreamMetaDataEvent:_streamName andMessage:@{@"metadata": params}];
+    [_proxy onStreamMetaDataEvent:_streamName andMessage:@{
+                                                           @"metadata": params,
+                                                           @"streamName": _streamName
+                                                           }];
 
 }
 
@@ -202,14 +205,16 @@
         return;
     }
 
-    [_proxy onStreamSubscriberStatus:_streamName andMessage:@{
-                                                             @"status": @{
-                                                                     @"code": @(statusCode),
-                                                                     @"message": msg,
-                                                                     @"name": @(r5_string_for_status(statusCode)),
-                                                                     @"streamName": _streamName
-                                                                     }
-                                                             }];
+    NSDictionary *dict = @{
+                           @"streamName": _streamName,
+                           @"status": @{
+                                   @"code": @(statusCode),
+                                   @"message": msg,
+                                   @"name": @(r5_string_for_status(statusCode)),
+                                   @"streamName": _streamName
+                                   }
+                           };
+    [_proxy onStreamSubscriberStatus:_streamName andMessage:dict];
 
 }
 

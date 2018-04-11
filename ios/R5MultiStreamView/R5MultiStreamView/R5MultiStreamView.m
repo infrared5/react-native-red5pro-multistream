@@ -111,7 +111,10 @@
         [subscriber start];
 
         if (self.onConfigured) {
-            self.onConfigured(@{@"key": streamName});
+            self.onConfigured(@{
+                                @"key": streamName,
+                                @"streamName": streamName
+                                });
         }
 
     });
@@ -139,8 +142,10 @@ andCameraHeight:(int)height
 
     dispatch_async(dispatch_get_main_queue(), ^{
 
+        LOGD("(LGANA) :publish()");
         R5PublisherStream *publisher = NULL;
         if (withVideo) {
+            LOGD("(LGANA) :publish:withVideo");
             publisher = [[R5PublisherStream alloc] initWithEventProxy:self andView:[self createVideoView]];
         }
         else {
@@ -168,7 +173,10 @@ andCameraHeight:(int)height
         }
 
         if (self.onConfigured) {
-            self.onConfigured(@{@"key": streamName});
+            self.onConfigured(@{
+                                @"key": streamName,
+                                @"streamName": streamName
+                                });
         }
 
         [self onDeviceOrientation:NULL];
@@ -317,12 +325,18 @@ andCameraHeight:(int)height
 }
 - (void)onStreamUnpublishNotification:(NSString *)streamName andMessage:(NSDictionary *)message {
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.onUnpublishNotification(message);
+        self.onUnpublishNotification(@{
+                                       @"streamName": streamName,
+                                       @"status": message
+                                       });
     });
 }
 - (void)onStreamUnsubscribeNotification:(NSString *)streamName andMessage:(NSDictionary *)message {
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.onUnsubscribeNotification(message);
+        self.onUnsubscribeNotification(@{
+                                         @"streamName": streamName,
+                                         @"status": message
+                                         });
     });
 }
 
