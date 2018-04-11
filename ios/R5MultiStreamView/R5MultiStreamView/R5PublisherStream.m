@@ -204,6 +204,7 @@
 # pragma Stream
 - (void)start {
     
+    LOGD("(LGANA) Publisher:start()");
     [_stream publish:_streamName type:_streamType];
     [_stream updateStreamMeta];
     
@@ -211,6 +212,7 @@
 
 - (void)stop {
     
+    LOGD("(LGANA) Publisher:stop()");
     if (_stream != NULL) {
         if (_camera != NULL) {
             [_camera stopVideoCapture];
@@ -235,10 +237,12 @@
 }
 
 - (void)pause {
+    LOGD("(LGANA) Publisher:pause()");
     [self stop];
 }
 
 - (void)resume {
+    LOGD("(LGANA) Publisher:resume()");
     // nada.
 }
 
@@ -249,7 +253,10 @@
 # pragma R5Stream:client
 - (void)onMetaData:(NSString *)params {
 
-    [_proxy onStreamMetaDataEvent:_streamName andMessage:@{@"metadata": params}];
+    [_proxy onStreamMetaDataEvent:_streamName andMessage:@{
+                                                           @"metadata": params,
+                                                           @"streamName": _streamName
+                                                           }];
     
 }
 
@@ -260,14 +267,19 @@
         _isStreaming = YES;
     }
     
-    [_proxy onStreamPublisherStatus:_streamName andMessage:@{
-                                                              @"status": @{
-                                                                      @"code": @(statusCode),
-                                                                      @"message": msg,
-                                                                      @"name": @(r5_string_for_status(statusCode)),
-                                                                      @"streamName": _streamName
-                                                                      }
-                                                              }];
+    LOGD("(LGANA) Publisher:status - %s", r5_string_for_status(statusCode));
+    
+    NSDictionary *dict = @{
+                            @"streamName": _streamName,
+                            @"status": @{
+                                      @"code": @(statusCode),
+                                      @"message": msg,
+                                      @"name": @(r5_string_for_status(statusCode)),
+                                      @"streamName": _streamName
+                                      }
+                              };
+    
+    [_proxy onStreamPublisherStatus:_streamName andMessage:dict];
     
     if (statusCode == r5_status_disconnected && _isStreaming) {
         [_proxy onStreamUnpublishNotification:_streamName andMessage:@{}];
