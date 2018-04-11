@@ -87,11 +87,14 @@
      andWithVideo:(BOOL)withVideo
      andAudioMode:(int)audioMode {
 
+    NSLog(@"(LGANA) subscribe: streamName(%@), host(%@), withVideo(%@)", streamName, host, withVideo ? @"true" : @"false");
     dispatch_async(dispatch_get_main_queue(), ^{
 
+        NSLog(@"(LGANA) subscribe(2): streamName(%@), host(%@), withVideo(%@)", streamName, host, withVideo ? @"true" : @"false");
         R5SubscriberStream *subscriber = NULL;
         if (withVideo) {
             subscriber = [[R5SubscriberStream alloc] initWithEventProxy:self andView:[self createVideoView]];
+            NSLog(@"Subscriber with video...");
         }
         else {
             subscriber = [[R5SubscriberStream alloc] initWithEventProxy:self];
@@ -101,8 +104,11 @@
         [_streamMap setObject:subscriber forKey:streamName];
 
         if (withVideo) {
+            UIView *view = [[UIView alloc] initWithFrame:self.frame];
             R5VideoViewController *ctrl = [subscriber getView];
-            [ctrl setView:self];
+            NSLog(@"Setup. CONTROL? (%s)", ctrl != NULL ? "true" : "false");
+            [ctrl setView:view];
+            [self addSubview:view];
             UIViewController *rootVc = [UIApplication sharedApplication].delegate.window.rootViewController;
             [ctrl setFrame:rootVc.view.frame];
             [ctrl showDebugInfo:_showDebugInfo];
@@ -142,10 +148,8 @@ andCameraHeight:(int)height
 
     dispatch_async(dispatch_get_main_queue(), ^{
 
-        LOGD("(LGANA) :publish()");
         R5PublisherStream *publisher = NULL;
         if (withVideo) {
-            LOGD("(LGANA) :publish:withVideo");
             publisher = [[R5PublisherStream alloc] initWithEventProxy:self andView:[self createVideoView]];
         }
         else {
