@@ -3,6 +3,7 @@ import {
   findNodeHandle,
   Alert,
   Button,
+  Dimensions,
   StyleSheet,
   Text,
   View
@@ -16,15 +17,18 @@ import {
   unsubscribe,
   publish,
   unpublish,
-  shutdown
+  shutdown,
+  updateScaleSize
 } from 'react-native-red5pro-multistream'
 
-const host = ''
-const licenseKey = ''
+const host = '18.218.79.30'
+const licenseKey = 'BWAP-WF5E-JZU2-6I5G'
 const bundleID = 'com.red5pro.multistream'
 
-const streamlistURL = 'https://${sm-host}/streammanager/api/2.0/event/list'
+const streamlistURL = 'https://nafarat.red5.org/streammanager/api/2.0/event/list'
 const subscribeURL = 'https://${sm-host}/streammanager/api/2.0/event/live/{streamName}?action=subscribe'
+
+const window = Dimensions.get('window')
 
 const PubType = {
   NONE: 0,
@@ -56,11 +60,13 @@ export default class App extends React.Component {
     this.onPublishAudio = this.onPublishAudio.bind(this)
     this.onSubscribe = this.onSubscribe.bind(this)
     this.onStop = this.onStop.bind(this)
+    this.onToggle = this.onToggle.bind(this)
 
     this._checkForSubscriptionStreams = this._checkForSubscriptionStreams.bind(this)
     this._updateSubscriberList = this._updateSubscriberList.bind(this)
 
     this.state = {
+      toggled: false,
       hasPermissions: false,
       publisherSelection: PubType.NONE,
       streamName: undefined,
@@ -76,10 +82,7 @@ export default class App extends React.Component {
         style: styles.videoView,
         licenseKey: licenseKey,
         bundleID: bundleID,
-        configuration: {
-          host: host
-        },
-        showDebug: true,
+        showDebugView: true,
         logLevel: R5LogLevel.DEBUG,
         onMetaData: this.onMetaData,
         onConfigured: this.onConfigured,
@@ -108,27 +111,6 @@ export default class App extends React.Component {
   }
 
   componentWillUpdate (nextProps, nextState) {
-    const currentSubs = this.state.subscriberList
-    const currentLength = currentSubs.length;
-    const nextSubs = nextState.subscriberList
-    if (currentLength < nextSubs.length) {
-      const newSubs = currentLength > 0 ? nextSubs.slice(currentLength - 1) : nextSubs
-      newSubs.map((sub, index) => {
-        const withVideo = sub.name.match(/r5pro-video/)
-        const withAudio = sub.name.match(/r5pro-audio/)
-        if (!withVideo && !withAudio) {
-          return false
-        }
-        console.log('SUBSCRIBE', sub)
-        subscribe(findNodeHandle(this.red5pro_multistream),
-          sub.name,
-          sub.serverAddress,
-          sub.scope.substring(1, sub.scope.length),
-          withVideo === null ? false : true)
-      })
-    } else if (currentLength > nextSubs.length) {
-      // TODO: unsubscribe
-    }
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -142,6 +124,31 @@ export default class App extends React.Component {
         'live',
         withVideo)
       this._checkForSubscriptionStreams(streamlistURL)
+    }
+
+    const currentSubs = prevState.subscriberList
+    const currentLength = currentSubs.length;
+    const nextSubs = this.state.subscriberList
+    console.log(currentSubs)
+    console.log('---')
+    console.log(nextSubs)
+    if (currentLength < nextSubs.length) {
+      const newSubs = currentLength > 0 ? nextSubs.slice(currentLength - 1) : nextSubs
+      newSubs.map((sub, index) => {
+        const withVideo = sub.name.match(/r5pro4-video/)
+        const withAudio = sub.name.match(/r5pro4-audio/)
+        if (!withVideo && !withAudio) {
+          return false
+        }
+        console.log('SUBSCRIBE', sub)
+        subscribe(findNodeHandle(this.red5pro_multistream),
+          sub.name,
+          sub.serverAddress,
+          sub.scope.substring(1, sub.scope.length),
+          withVideo === null ? false : true)
+      })
+    } else if (currentLength > nextSubs.length) {
+      // TODO: unsubscribe
     }
   }
 
@@ -159,15 +166,16 @@ export default class App extends React.Component {
         <View style={styles.container}>
           <R5MultiStreamView
             ref={assignVideoRef}
-            {...this.state.videoProps} 
+            {...this.state.videoProps}
           />
           {subscribers}
+          <Button title="Toggle" onPress={this.onToggle} style={{ flex: 1, height: 60, flexBasis: 60 }} />
           <Button title="Stop" onPress={this.onStop} style={{ flex: 1, height: 60, flexBasis: 60 }} />
         </View>
       )
     } else if (this.state.hasPermissions) {
       return (
-        <View style={[styles.container, { alignItems: 'center', justifyContent: 'space-between' }]}>
+        <View style={[styles.container, { alignItems: 'center', justifyContent: 'space-around' }]}>
           <Button style={{ marginBottom: 20 }} onPress={this.onPublishAudio} title="Publish Audio" />
           <Button onPress={this.onPublish} title="Publish Video+Audio" />
         </View>
@@ -185,8 +193,8 @@ export default class App extends React.Component {
     const mystream = this.state.streamName
     const currentStreamList = this.state.subscriberList
     const availableSubscribers = json.filter((stream, index) => {
-      const withVideo = stream.name.match(/r5pro-video/)
-      const withAudio = stream.name.match(/r5pro-audio/)
+      const withVideo = stream.name.match(/r5pro4-video/)
+      const withAudio = stream.name.match(/r5pro4-audio/)
       let i = currentStreamList.length
       while (--i > -1) {
         if (currentStreamList[i].name === stream.name) {
@@ -263,27 +271,15 @@ export default class App extends React.Component {
 
   onConfigured (event) {
     console.log(`onConfigured :: ${event.nativeEvent.key}`)
-    /*
-    this.refs.video.setState({
-      configured: true
-    })
-    if (this.state.isPublisher) {
-      publish(findNodeHandle(this.refs.video), this.state.videoProps.configuration.streamName)
-    }
-    else {
-      subscribe(findNodeHandle(this.refs.video), this.state.videoProps.configuration.streamName)
-    }
-    */
   }
 
   onPublisherStreamStatus (event) {
-    console.log(event.nativeEvent)
-    console.log(`onPublisherStreamStatus :: ${JSON.stringify(event.nativeEvent.status, null, 2)}`)
-    const status = event.nativeEvent.status
+    const { status, streamName } = event.nativeEvent
+    console.log(`onPublisherStreamStatus :: ${JSON.stringify(status, null, 2)}`)
     let message = isValidStatusMessage(status.message) ? status.message : status.name
     if (status.name === 'ERROR') {
       this.bannedList.push(streamName)
-      Alert('Stream Error', `${streamName}: ${message}`)
+      Alert.alert('Stream Error', `${streamName}: ${message}`)
     }
       /*
     if (!this.state.inErrorState) {
@@ -296,8 +292,8 @@ export default class App extends React.Component {
   }
 
   onSubscriberStreamStatus (event) {
-    console.log(`onSubscriberStreamStatus :: ${JSON.stringify(event.nativeEvent.status, null, 2)}`)
     const { status, streamName } = event.nativeEvent
+    console.log(`onSubscriberStreamStatus :: ${JSON.stringify(status, null, 2)}`)
     let message = isValidStatusMessage(status.message) ? status.message : status.name
     if (status.name === 'CLOSE' ||
         (status.name === 'NET_STATUS' && status.message === 'NetStream.Play.UnpublishNotify')) {
@@ -311,7 +307,7 @@ export default class App extends React.Component {
     }
     else if (status.name === 'ERROR') {
       this.bannedList.push(streamName)
-      Alert('Stream Error', `${streamName}: ${message}`)
+      Alert.alert('Stream Error', `${streamName}: ${message}`)
     }
       /*
     if (!this.state.inErrorState) {
@@ -348,7 +344,7 @@ export default class App extends React.Component {
   onPublish () {
     const randomId = Math.floor(Math.random() * 0x10000).toString(16)
     this.setState({
-      streamName: 'r5pro-videoStream-' + randomId,
+      streamName: 'r5pro4-videoStream-' + randomId,
       publisherSelection: PubType.VIDEO
     })
   }
@@ -356,7 +352,7 @@ export default class App extends React.Component {
   onPublishAudio () {
     const randomId = Math.floor(Math.random() * 0x10000).toString(16)
     this.setState({
-      streamName: 'r5pro-audioStream-' + randomId,
+      streamName: 'r5pro4-audioStream-' + randomId,
       publisherSelection: PubType.AUDIO
     })
   }
@@ -374,7 +370,15 @@ export default class App extends React.Component {
       publisherSelection: PubType.NONE
     })
   }
-  
+
+  onToggle () {
+    if (this.state.toggled) {
+      updateScaleSize(findNodeHandle(this.red5pro_multistream), this.state.streamName,  parseInt(window.width, 10), parseInt(window.height, 10), parseInt(window.width, 10), parseInt(window.height, 10))
+    } else {
+      updateScaleSize(findNodeHandle(this.red5pro_multistream), this.state.streamName, 120, 120, parseInt(window.width, 10), parseInt(window.height, 10))
+    }
+    this.setState({ toggled: !this.state.toggled })
+  }
 }
 
 const styles = StyleSheet.create({
@@ -386,7 +390,7 @@ const styles = StyleSheet.create({
   videoView: {
     flex: 1,
     flexDirection: 'row',
-    // justifyContent: 'center',
+    justifyContent: 'center',
     backgroundColor: 'black'
   },
   subscriberTag: {

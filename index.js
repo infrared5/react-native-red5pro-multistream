@@ -13,6 +13,7 @@ import {
   swapCamera,
   updateScaleMode,
   updateScaleSize,
+  setPermissionsFlag,
   shutdown
 } from './src/commands/R5MultiStreamView.commands'
 
@@ -20,6 +21,6 @@ module.exports = {
   R5MultiStreamView,
   subscribe, unsubscribe, preview, publish, unpublish,
   swapCamera, updateScaleMode, updateScaleSize,
-  shutdown,
+  setPermissionsFlag, shutdown,
   R5AudioMode, R5LogLevel, R5PublishType, R5ScaleMode
 }
