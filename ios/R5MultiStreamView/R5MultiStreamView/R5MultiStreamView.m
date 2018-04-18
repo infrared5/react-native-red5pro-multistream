@@ -169,8 +169,10 @@ andCameraHeight:(int)height
 
 
         if (withVideo) {
+            UIView *view = [[UIView alloc] initWithFrame:self.frame];
             R5VideoViewController *ctrl = [publisher getView];
-            [ctrl setView:self];
+            [ctrl setView:view];
+            [self addSubview:view];
             UIViewController *rootVc = [UIApplication sharedApplication].delegate.window.rootViewController;
             [ctrl setFrame:rootVc.view.frame];
             [ctrl showDebugInfo:_showDebugInfo];
