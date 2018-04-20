@@ -372,7 +372,7 @@ public class PublisherStream implements Stream, R5ConnectionListener {
 //        }
 
         if (adaptor != null) {
-            adaptor.close();
+            adaptor.Close();
         }
         
         if (mStream != null) {
