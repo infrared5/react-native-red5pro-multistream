@@ -28,6 +28,8 @@ public class R5MultiStreamManager extends SimpleViewManager<R5MultiStreamLayout>
     private static final int COMMAND_UPDATE_SCALE_SIZE = 8;
     private static final int COMMAND_SHUTDOWN = 9;
     private static final int COMMAND_PERMISSIONS_FLAG = 10;
+    private static final int COMMAND_SEND_TO_BACKGROUND = 11;
+    private static final int COMMAND_RETURN_TO_FOREGROUND = 12;
 
     private R5MultiStreamLayout mView;
     private ThemedReactContext mContext;
@@ -101,6 +103,16 @@ public class R5MultiStreamManager extends SimpleViewManager<R5MultiStreamLayout>
             case COMMAND_UNPUBLISH:
 
                 root.unpublish(streamName);
+
+                break;
+            case COMMAND_SEND_TO_BACKGROUND:
+
+                root.sendToBackground(streamName);
+
+                break;
+            case COMMAND_RETURN_TO_FOREGROUND:
+
+                root.returnToForeground(streamName);
 
                 break;
             case COMMAND_SWAP_CAMERA:

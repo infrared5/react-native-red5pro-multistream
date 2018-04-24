@@ -158,6 +158,14 @@
 
 }
 
+- (void)detach {
+    // nada.
+}
+
+- (void)reattach {
+    // nada.
+}
+
 - (void)swapCamera {
 
     _useBackfacingCamera = !_useBackfacingCamera;

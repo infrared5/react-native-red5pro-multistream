@@ -108,7 +108,9 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
         PREVIEW("preview", 7),
         UPDATE_SCALE_SIZE("updateScaleSize", 8),
         SHUTDOWN("shutdown", 9),
-        PERMISSIONS_FLAG("setPermissionsFlag", 10);
+        PERMISSIONS_FLAG("setPermissionsFlag", 10),
+        SEND_TO_BACKGROUND("sendToBackground", 11),
+        RETURN_TO_FOREGROUND("returnToForeground", 12);
 
         private final String mName;
         private final int mValue;
@@ -248,6 +250,14 @@ public class R5MultiStreamLayout extends FrameLayout implements EventEmitterProx
             streamMap.remove(streamName);
         }
 
+    }
+
+    public void sendToBackground (String streamName) {
+        // Not a requirement as of April 24th, 2018
+    }
+
+    public void returnToForeground (String streamName) {
+        // Not a requirement as of April 24th, 2018
     }
 
     public void swapCamera (String streamName) {

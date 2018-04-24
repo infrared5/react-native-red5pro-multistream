@@ -238,6 +238,38 @@ andCameraHeight:(int)height
 
 }
 
+- (void)sendToBackground:(NSString *)streamName {
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        id<Stream> stream = (id<Stream>)[_streamMap objectForKey:streamName];
+        if (stream != NULL) {
+            R5VideoViewController *videoView = [stream getView];
+            if (videoView != NULL) {
+                if ([stream respondsToSelector:@selector(detach)]) {
+                    [(R5SubscriberStream *)stream detach];
+                }
+            }
+        }
+    });
+    
+}
+
+- (void)returnToForeground:(NSString *)streamName {
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        id<Stream> stream = (id<Stream>)[_streamMap objectForKey:streamName];
+        if (stream != NULL) {
+            R5VideoViewController *videoView = [stream getView];
+            if (videoView != NULL) {
+                if ([stream respondsToSelector:@selector(reattach)]) {
+                    [(R5SubscriberStream *)stream reattach];
+                }
+            }
+        }
+    });
+    
+}
+
 - (void)shutdown {
 
     dispatch_async(dispatch_get_main_queue(), ^{
