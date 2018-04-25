@@ -295,12 +295,16 @@ andCameraHeight:(int)height
 
     _isResumable = YES;
     dispatch_async(dispatch_get_main_queue(), ^{
+        id removalKey = NULL;
         for (id key in _streamMap) {
             id<Stream> stream = (id<Stream>)[_streamMap objectForKey:key];
             [stream pause];
             if ([stream respondsToSelector:@selector(swapCamera)]) { // its a publisher...
-                [_streamMap removeObjectForKey:key];
+                removalKey = key;
             }
+        }
+        if (removalKey != NULL) {
+            [_streamMap removeObjectForKey:removalKey];
         }
     });
 
