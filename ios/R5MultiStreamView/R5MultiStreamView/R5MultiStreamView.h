@@ -24,6 +24,8 @@
 - (void)stop;
 - (void)pause;
 - (void)resume;
+- (void)detach;
+- (void)reattach;
 - (R5VideoViewController *)getView;
 
 @end
@@ -73,6 +75,10 @@ andCameraHeight:(int)height
 - (void)unpublish:(NSString *)streamName;
 
 - (void)swapCamera:(NSString *)streamName;
+
+- (void)sendToBackground:(NSString *)streamName;
+
+- (void)returnToForeground:(NSString *)streamName;
 
 - (void)updateScaleSize:(NSString *)streamName
               withWidth:(int)width

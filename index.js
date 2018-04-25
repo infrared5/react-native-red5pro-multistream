@@ -10,6 +10,8 @@ import {
   preview,
   publish,
   unpublish,
+  sendToBackground,
+  returnToForeground,
   swapCamera,
   updateScaleMode,
   updateScaleSize,
@@ -20,6 +22,7 @@ import {
 module.exports = {
   R5MultiStreamView,
   subscribe, unsubscribe, preview, publish, unpublish,
+  sendToBackground, returnToForeground,
   swapCamera, updateScaleMode, updateScaleSize,
   setPermissionsFlag, shutdown,
   R5AudioMode, R5LogLevel, R5PublishType, R5ScaleMode

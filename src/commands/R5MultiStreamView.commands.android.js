@@ -49,6 +49,14 @@ export const unpublish = (handle, streamName) => {
   UIManager.dispatchViewManagerCommand(handle, Commands.unpublish, [streamName])
 }
 
+export const sendToBackground = (handle, streamName) => {
+  UIManager.dispatchViewManagerCommand(handle, Commands.sendToBackground, [streamName])
+}
+
+export const returnToForeground = (handle, streamName) => {
+  UIManager.dispatchViewManagerCommand(handle, Commands.returnToForeground, [streamName])
+}
+
 export const swapCamera = (handle, streamName) => {
   UIManager.dispatchViewManagerCommand(handle, Commands.swapCamera, [streamName])
 }

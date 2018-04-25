@@ -72,7 +72,7 @@
 
     if (_view != NULL) {
         [_view attachStream:stream];
-        [_view showPreview:YES];
+//        [_view showPreview:YES];
     }
 
     _stream = stream;
@@ -131,6 +131,18 @@
     [self setConfiguration:_configuration];
     [self start];
 
+}
+
+- (void)detach {
+    if (_view != NULL) {
+        [_view pauseRender];
+    }
+}
+
+- (void)reattach {
+    if (_stream != NULL && _view != NULL) {
+        [_view resumeRender];
+    }
 }
 
 - (void)updateOrientation:(int)value {

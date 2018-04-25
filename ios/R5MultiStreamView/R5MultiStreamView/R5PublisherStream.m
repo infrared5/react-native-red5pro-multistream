@@ -19,6 +19,7 @@
     id<EventEmitterProxy> _proxy;
     R5Camera *_camera;
     R5Microphone *_microphone;
+    R5AdaptiveBitrateController *_adaptor;
 
     int _streamType;
     BOOL _useAudio;
@@ -145,6 +146,7 @@
         else {
             [abrController setRequiresVideo:NO];
         }
+        _adaptor = abrController;
     }
 
     if (_view != NULL) {
@@ -154,6 +156,14 @@
         [_stream attachVideo:_camera];
     }
 
+}
+
+- (void)detach {
+    // nada.
+}
+
+- (void)reattach {
+    // nada.
 }
 
 - (void)swapCamera {
@@ -213,6 +223,9 @@
 - (void)stop {
 
     LOGD("(LGANA) Publisher:stop()");
+    if (_adaptor != NULL) {
+        [_adaptor close];
+    }
     if (_stream != NULL) {
         if (_camera != NULL) {
             [_camera stopVideoCapture];

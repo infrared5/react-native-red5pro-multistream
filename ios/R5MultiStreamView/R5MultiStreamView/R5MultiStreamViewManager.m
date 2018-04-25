@@ -131,6 +131,14 @@ RCT_EXPORT_METHOD(unpublish:(nonnull NSString *)streamName) {
     [r5View unpublish:streamName];
 }
 
+RCT_EXPORT_METHOD(sendToBackground:(nonnull NSString *)streamName) {
+    [r5View sendToBackground:streamName];
+}
+
+RCT_EXPORT_METHOD(returnToForeground:(nonnull NSString *)streamName) {
+    [r5View returnToForeground:streamName];
+}
+
 RCT_EXPORT_METHOD(swapCamera:(nonnull NSString *)streamName) {
     [r5View swapCamera:streamName];
 }

@@ -41,6 +41,7 @@ public class PublisherStream implements Stream, R5ConnectionListener {
     protected R5Camera mCamera;
     protected R5Microphone mMicrophone;
     protected R5VideoView mVideoView;
+    protected R5AdaptiveBitrateController adaptor;
     protected boolean mUseBackfacingCamera = false;
     protected boolean mUseAudio = true;
 
@@ -260,7 +261,7 @@ public class PublisherStream implements Stream, R5ConnectionListener {
 
         // Assign ABR Controller if requested.
         if (useABR) {
-            R5AdaptiveBitrateController adaptor = new R5AdaptiveBitrateController();
+            adaptor = new R5AdaptiveBitrateController();
             adaptor.AttachStream(mStream);
         }
 
@@ -369,6 +370,10 @@ public class PublisherStream implements Stream, R5ConnectionListener {
 //            mCamera = null;
 //
 //        }
+
+        if (adaptor != null) {
+            adaptor.Close();
+        }
 
         if (mStream != null) {
             mStream.client = null;

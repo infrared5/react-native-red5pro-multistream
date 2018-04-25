@@ -8,6 +8,8 @@ export const unsubscribe = (handle, streamName) => R5MultiStreamViewManager.unsu
 export const preview = (handle, streamName) => R5MultiStreamViewManager.preview(streamName)
 export const publish = (handle, streamName, host, context, withVideo, width = 640, height = 480, streamType = R5PublishType.LIVE) => R5MultiStreamViewManager.publish(streamName, host, context, withVideo, width, height, streamType)
 export const unpublish = (handle, streamName) => R5MultiStreamViewManager.unpublish(streamName)
+export const sendToBackground = (handle, streamName) => R5MultiStreamViewManager.sendToBackground(streamName)
+export const returnToForeground = (handle, streamName) => R5MultiStreamViewManager.returnToForeground(streamName)
 export const swapCamera = (handle, streamName) => R5MultiStreamViewManager.swapCamera(streamName)
 export const updateScaleMode = (handle, streamName, scale) => R5MultiStreamViewManager.updateScaleMode(streamName, scale)
 export const updateScaleSize = (handle, streamName, width, height, screenWidth, screenHeight) => R5MultiStreamViewManager.updateScaleSize(streamName, width, height, screenWidth, screenHeight)
