@@ -1,0 +1,32 @@
+{
+  "name": "example",
+  "version": "0.1.0",
+  "private": true,
+  "devDependencies": {
+    "@babel/plugin-proposal-object-rest-spread": "^7.2.0",
+    "babel-eslint": "^9.0.0",
+    "babel-preset-react-native": "^5.0.1",
+    "eslint": "^5.9.0",
+    "jest-expo": "^31.0.0",
+    "metro-react-native-babel-preset": "^0.50.0",
+    "react-test-renderer": "16.3.2"
+  },
+  "scripts": {
+    "start": "react-native start",
+    "android": "react-native run-android",
+    "preandroid:prod": "react-native bundle --dev false --platform android --entry-file index.android.js --bundle-output ./android/app/build/intermediates/assets/debug/index.android.bundle --assets-dest ./android/app/build/intermediates/res/merged/debug",
+    "android:prod": "cd android && ./gradlew assembleRelease",
+    "ios": "react-native run-ios",
+    "test": "node node_modules/jest/bin/jest.js"
+  },
+  "jest": {
+    "preset": "jest-expo"
+  },
+  "dependencies": {
+    "react": "16.6.1",
+    "react-native": "^0.57.7",
+    "react-native-permissions": "^1.1.1",
+    "react-native-elements": "^0.19.1",
+    "react-native-red5pro-multistream": "git@github.com:infrared5/react-native-red5pro-multistream#develop"
+  }
+}

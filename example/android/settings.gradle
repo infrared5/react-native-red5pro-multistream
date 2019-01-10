@@ -1,0 +1,6 @@
+rootProject.name = 'Red5ProMultiStreamExample'
+
+include ':app',
+        ':react-native-red5pro-multistream'
+
+project(':react-native-red5pro-multistream').projectDir = new File(rootProject.projectDir, '../../android')
